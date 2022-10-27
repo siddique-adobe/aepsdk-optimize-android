@@ -19,6 +19,7 @@ import com.adobe.marketing.mobile.Edge
 import com.adobe.marketing.mobile.Lifecycle
 import com.adobe.marketing.mobile.LoggingMode
 import com.adobe.marketing.mobile.MobileCore
+import com.adobe.marketing.mobile.edge.consent.Consent
 import com.adobe.marketing.mobile.edge.identity.Identity
 import com.adobe.marketing.mobile.optimize.Optimize
 // Optimize Tutorial: CODE SECTION 1 ENDS */
@@ -26,7 +27,7 @@ import com.adobe.marketing.mobile.optimize.Optimize
 class MainApplication : Application() {
 
     companion object {
-        const val LAUNCH_ENVIRONMENT_FILE_ID = ""
+        const val DATACOLLECTION_ENVIRONMENT_FILE_ID = ""
     }
 
     override fun onCreate() {
@@ -41,8 +42,9 @@ class MainApplication : Application() {
         Edge.registerExtension()
         Optimize.registerExtension()
         Assurance.registerExtension()
+        Consent.registerExtension()
 
-        MobileCore.configureWithAppID(LAUNCH_ENVIRONMENT_FILE_ID)
+        MobileCore.configureWithAppID(DATACOLLECTION_ENVIRONMENT_FILE_ID)
         MobileCore.start {
             print("Adobe mobile SDKs are successfully registered.")
         }

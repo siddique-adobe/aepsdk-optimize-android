@@ -192,10 +192,10 @@ Optimize.registerExtension();
 
 ### resetIdentities
 
-This `MobileCore` API is a request to each extension to reset its identities. Every extension responds to this request in it's own unique manner. For example, Optimize extension uses this API call to clear out its client-side in-memory propositions cache.
+This `MobileCore` API is a request to each extension to reset its identities. Every extension responds to this request in its own unique manner. For example, Optimize extension uses this API call to clear out its client-side in-memory propositions cache.
 
 > [!WARNING]
-> This is a **destructive** API call and can lead to unintended behavior, e.g. resetting of Experience Cloud ID (ECID). It should be sparingly used and extreme caution should be followed!
+> This API call can lead to unintended SDK behavior, e.g. resetting of Experience Cloud ID (ECID). So it should be sparingly used and extreme caution should be followed!
 
 <!-- tabs:start -->
 
