@@ -28,6 +28,7 @@ class MainApplication : Application() {
 
     companion object {
         const val DATACOLLECTION_ENVIRONMENT_FILE_ID = ""
+        const val OVERRIDE_DATASET_ID = ""
     }
 
     override fun onCreate() {
@@ -48,6 +49,12 @@ class MainApplication : Application() {
         MobileCore.start {
             print("Adobe mobile SDKs are successfully registered.")
         }
+        // FOR DEMO PURPOSE ONLY: Update Configuration with reduced lifecycle timeout.
+        MobileCore.updateConfiguration(mapOf("lifecycle.sessionTimeout" to 10))
+
         // Optimize Tutorial: CODE SECTION 2 ENDS */
+
+        // Update Configuration with override dataset identifier
+        // MobileCore.updateConfiguration(mapOf("optimize.datasetId" to OVERRIDE_DATASET_ID))
     }
 }

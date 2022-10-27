@@ -12,6 +12,7 @@
 package com.adobe.marketing.optimizetutorial
 
 import android.app.Application
+import com.adobe.marketing.mobile.MobileCore
 
 /* Optimize Tutorial: CODE SECTION 1/10 BEGINS
 import com.adobe.marketing.mobile.Assurance
@@ -26,7 +27,8 @@ import com.adobe.marketing.mobile.optimize.Optimize
 class MainApplication : Application() {
 
     companion object {
-        const val LAUNCH_ENVIRONMENT_FILE_ID = "3149c49c3910/a2778296f5c3/launch-f3e9fb22cb83-development"
+        const val DATACOLLECTION_ENVIRONMENT_FILE_ID = ""
+        const val OVERRIDE_DATASET_ID = ""
     }
 
     override fun onCreate() {
@@ -42,10 +44,16 @@ class MainApplication : Application() {
         Optimize.registerExtension()
         Assurance.registerExtension()
 
-        MobileCore.configureWithAppID(LAUNCH_ENVIRONMENT_FILE_ID)
+        MobileCore.configureWithAppID(DATACOLLECTION_ENVIRONMENT_FILE_ID)
         MobileCore.start {
             print("Adobe mobile SDKs are successfully registered.")
         }
+        // FOR DEMO PURPOSE ONLY: Update Configuration with reduced lifecycle timeout.
+        MobileCore.updateConfiguration(mapOf("lifecycle.sessionTimeout" to 10))
+
         // Optimize Tutorial: CODE SECTION 2 ENDS */
+
+        // Update Configuration with override dataset identifier
+        // MobileCore.updateConfiguration(mapOf("optimize.datasetId" to OVERRIDE_DATASET_ID))
     }
 }
