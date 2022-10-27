@@ -24,6 +24,6 @@ dependencies {
 
 Click on `Sync Now` in the top right corner (**2**) to install the dependencies.
 
-| ![Adding Gradle dependencies](../../assets/android-gradle-dependencies.png?raw=true) |
+| ![Adding Gradle dependencies](../assets/android-gradle-dependencies.png?raw=true) |
 | :---: |
 | **Adding Gradle dependencies** |
