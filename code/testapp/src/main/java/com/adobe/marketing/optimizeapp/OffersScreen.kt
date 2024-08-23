@@ -218,6 +218,16 @@ fun OffersView(viewModel: MainViewModel) {
                         style = MaterialTheme.typography.button
                     )
                 }
+
+                Button(modifier = Modifier.align(Alignment.CenterEnd), onClick = {
+                    viewModel.displayPropositions(viewModel.optimizePropositionStateMap[viewModel.targetMboxDecisionScope?.name]?.offers?.toList())
+                }) {
+                    Text(
+                        text = "Displayed \n Propositions",
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.button
+                    )
+                }
             }
         }
     }

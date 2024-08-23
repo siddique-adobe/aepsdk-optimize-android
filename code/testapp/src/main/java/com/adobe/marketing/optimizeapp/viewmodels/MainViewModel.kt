@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModel
 import com.adobe.marketing.mobile.AdobeCallbackWithError
 import com.adobe.marketing.mobile.AdobeError
 import com.adobe.marketing.mobile.optimize.DecisionScope
+import com.adobe.marketing.mobile.optimize.Offer
 import com.adobe.marketing.mobile.optimize.Optimize
 import com.adobe.marketing.mobile.optimize.OptimizeProposition
 import com.adobe.marketing.optimizeapp.models.OptimizePair
@@ -127,4 +128,8 @@ class MainViewModel: ViewModel() {
 
     val isValidProduct: Boolean
         get() = textTargetProductId.isNotEmpty() && textTargetProductCategoryId.isNotEmpty()
+
+    fun displayPropositions(offer: List<Offer>?) {
+        Optimize.OffersDisplayed(offer)
+    }
 }

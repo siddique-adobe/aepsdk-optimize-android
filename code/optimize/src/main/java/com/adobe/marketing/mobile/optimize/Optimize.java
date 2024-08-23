@@ -22,6 +22,8 @@ import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
 import com.adobe.marketing.mobile.util.DataReaderException;
+
+import java.lang.ref.SoftReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -326,5 +328,86 @@ public class Optimize {
         if (callbackWithError != null) {
             callbackWithError.fail(error);
         }
+    }
+
+    public static void OffersDisplayed(List<Offer> offers) {
+        trackWithData(generateDisplayInteractionXdmForOffers(offers));
+    }
+
+    private static void trackWithData(final Map<String, Object> xdm) {
+        if (OptimizeUtils.isNullOrEmpty(xdm)) {
+            Log.debug(
+                    OptimizeConstants.LOG_TAG,
+                    SELF_TAG,
+                    "Failed to dispatch track propositions request event, input xdm is null or"
+                            + " empty.");
+            return;
+        }
+
+        final Map<String, Object> eventData = new HashMap<>();
+        eventData.put(
+                OptimizeConstants.EventDataKeys.REQUEST_TYPE,
+                OptimizeConstants.EventDataValues.REQUEST_TYPE_TRACK);
+        eventData.put(OptimizeConstants.EventDataKeys.PROPOSITION_INTERACTIONS, xdm);
+
+        final Event edgeEvent =
+                new Event.Builder(
+                        OptimizeConstants.EventNames.TRACK_PROPOSITIONS_REQUEST,
+                        OptimizeConstants.EventType.OPTIMIZE,
+                        OptimizeConstants.EventSource.REQUEST_CONTENT)
+                        .setEventData(eventData)
+                        .build();
+
+        MobileCore.dispatchEvent(edgeEvent);
+    }
+
+    private static Map<String, Object> generateDisplayInteractionXdmForOffers(List<Offer> offers) {
+        if (offers == null) {
+            return null;
+        }
+        SoftReference<OptimizeProposition> propositionReference = offers.get(0).propositionReference;
+        if (propositionReference == null || propositionReference.get() == null) {
+            return null;
+        }
+
+        OptimizeProposition optimizeProposition = propositionReference.get();
+        final Map<String, Object> propositionsData = new HashMap<>();
+        propositionsData.put(
+                OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_ID,
+                optimizeProposition.getId());
+        propositionsData.put(
+                OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_SCOPE,
+                optimizeProposition.getScope());
+        propositionsData.put(
+                OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_SCOPEDETAILS,
+                optimizeProposition.getScopeDetails());
+
+        final List<Map<String, Object>> propositionItemsList = new ArrayList<>();
+        for (int i = 0; i < offers.size(); i++) {
+            int finalI = i;
+            propositionItemsList.add(new HashMap<String, Object>() {{
+                put(OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_ITEMS_ID, offers.get(finalI).getId());
+            }});
+        }
+
+        // Add list containing proposition item ids.
+        propositionsData.put(
+                OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_ITEMS, propositionItemsList);
+
+        final List<Map<String, Object>> decisioningPropositions = new ArrayList<>();
+        decisioningPropositions.add(propositionsData);
+
+        final Map<String, Object> experienceDecisioning = new HashMap<>();
+        experienceDecisioning.put(
+                OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS, decisioningPropositions);
+
+        final Map<String, Object> experience = new HashMap<>();
+        experience.put(OptimizeConstants.JsonKeys.EXPERIENCE_DECISIONING, experienceDecisioning);
+
+        final Map<String, Object> xdm = new HashMap<>();
+        xdm.put(OptimizeConstants.JsonKeys.EXPERIENCE, experience);
+        xdm.put(OptimizeConstants.JsonKeys.EXPERIENCE_EVENT_TYPE, OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY);
+
+        return xdm;
     }
 }
