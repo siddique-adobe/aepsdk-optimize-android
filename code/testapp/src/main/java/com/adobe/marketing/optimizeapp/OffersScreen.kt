@@ -42,6 +42,8 @@ import com.adobe.marketing.mobile.edge.identity.IdentityMap
 import com.adobe.marketing.mobile.optimize.DecisionScope
 import com.adobe.marketing.mobile.optimize.Offer
 import com.adobe.marketing.mobile.optimize.OfferType
+import com.adobe.marketing.mobile.optimize.Optimize.displayPropositions
+import com.adobe.marketing.mobile.optimize.OptimizeProposition
 import com.adobe.marketing.optimizeapp.viewmodels.MainViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -53,6 +55,10 @@ private val clickHandler: (Offer) -> Unit = { offer ->
 
 private val displayHandler: (Offer) -> Unit = { offer ->
     offer.displayed()
+}
+
+private val displayPropositionsHandler: (List<OptimizeProposition>) -> Unit = { props ->
+    displayPropositions(props)
 }
 
 @Composable
@@ -113,6 +119,8 @@ fun OffersView(viewModel: MainViewModel) {
                         }
                     }
                 })
+            }.also {
+                displayPropositionsHandler(viewModel.optimizePropositionStateMap.values.toList())
             }
         }
 
