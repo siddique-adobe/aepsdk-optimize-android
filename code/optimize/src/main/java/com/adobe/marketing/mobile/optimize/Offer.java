@@ -308,6 +308,9 @@ public class Offer {
      * @see Offer#generateTapInteractionXdm() (String)
      */
     public Map<String, Object> generateDisplayInteractionXdm() {
+        if (propositionReference == null || propositionReference.get() == null) {
+            return null;
+        }
         return OptimizeUtils.generateInteractionXdm(
                 Collections.singletonList(propositionReference.get()),
                 OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
@@ -328,6 +331,9 @@ public class Offer {
      * @see OptimizeUtils#generateInteractionXdm(List, String, String)
      */
     public Map<String, Object> generateTapInteractionXdm() {
+        if (propositionReference == null || propositionReference.get() == null) {
+            return null;
+        }
         return OptimizeUtils.generateInteractionXdm(
                 Collections.singletonList(propositionReference.get()),
                 OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_INTERACT,
