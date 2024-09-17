@@ -31,6 +31,7 @@ import java.util.Map;
 public class Optimize {
     public static final Class<? extends Extension> EXTENSION = OptimizeExtension.class;
     private static final String SELF_TAG = "Optimize";
+    private static final PropositionsRepository propositionsRepository = PropositionsRepositoryImpl.INSTANCE;
 
     private Optimize() {}
 

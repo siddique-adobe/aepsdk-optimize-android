@@ -16,7 +16,6 @@ import com.adobe.marketing.mobile.util.DataReader;
 import com.adobe.marketing.mobile.util.DataReaderException;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,7 @@ public class Offer {
     private Map<String, String> characteristics;
 
     SoftReference<OptimizeProposition> propositionReference;
+    PropositionsRepository propositionsRepository = PropositionsRepositoryImpl.INSTANCE;
 
     /**
      * Private constructor.
@@ -280,7 +280,9 @@ public class Offer {
      * @see OptimizeUtils#trackWithData(Map)
      */
     public void displayed() {
-        OptimizeUtils.trackWithData(generateDisplayInteractionXdm());
+        if (propositionReference != null || propositionReference.get() != null) {
+            propositionsRepository.trackDisplayInteraction();
+        }
     }
 
     /**
