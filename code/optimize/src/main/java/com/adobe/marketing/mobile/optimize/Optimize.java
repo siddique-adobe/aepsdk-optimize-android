@@ -31,6 +31,7 @@ import java.util.Map;
 public class Optimize {
     public static final Class<? extends Extension> EXTENSION = OptimizeExtension.class;
     private static final String SELF_TAG = "Optimize";
+    private static final PropositionsRepository propositionsRepository = PropositionsRepositoryImpl.INSTANCE;
 
     private Optimize() {}
 
@@ -329,9 +330,7 @@ public class Optimize {
     }
 
     public static void trackDisplayedPropositions(final List<OptimizeProposition> propositions) {
-        OptimizeUtils.trackWithData(
-                OptimizeUtils.generateInteractionXdm(
-                        propositions,
-                        OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY));
+        propositionsRepository.addDisplayedPropositions(propositions);
+        propositionsRepository.trackDisplayInteraction();
     }
 }
