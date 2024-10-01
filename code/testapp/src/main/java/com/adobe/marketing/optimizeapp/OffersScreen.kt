@@ -22,9 +22,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +65,7 @@ private val displayPropositionsHandler: (List<Offer>) -> Unit = { offers ->
 
 @Composable
 fun OffersView(viewModel: MainViewModel) {
+    val shouldBatchDisplayPropositions = remember { mutableStateOf(false) }
     var listState = rememberLazyListState()
     Column(
         modifier = Modifier
@@ -77,15 +81,15 @@ fun OffersView(viewModel: MainViewModel) {
             ) {
 
                 OffersSectionText(sectionName = "Text Offers")
-                TextOffers()
+                TextOffers(shouldCallDisplayProposition = !shouldBatchDisplayPropositions.value)
                 OffersSectionText(sectionName = "Image Offers")
                 ImageOffers()
                 OffersSectionText(sectionName = "HTML Offers")
                 HTMLOffers()
                 OffersSectionText(sectionName = "JSON Offers")
-                JSONOffers()
+                JSONOffers(shouldCallDisplayProposition = !shouldBatchDisplayPropositions.value)
                 OffersSectionText(sectionName = "Target Offers")
-                TargetOffersView()
+                TargetOffersView(shouldCallDisplayProposition = !shouldBatchDisplayPropositions.value)
             }
         } else {
             LazyColumn(
@@ -94,37 +98,89 @@ fun OffersView(viewModel: MainViewModel) {
                     .fillMaxHeight(fraction = 0.85f),
                 state = listState
             ) {
-                items(items = viewModel.optimizePropositionStateMap.keys.toList().sorted(), key = { item -> item }, itemContent = { item ->
-                    when(item) {
-                        viewModel.textDecisionScope?.name -> {
-                            OffersSectionText(sectionName = "Text Offers")
-                            TextOffers(offers = viewModel.optimizePropositionStateMap[viewModel.textDecisionScope?.name]?.offers, listState = listState)
+                items(
+                    items = viewModel.optimizePropositionStateMap.keys.toList().sorted(),
+                    key = { item -> item },
+                    itemContent = { item ->
+                        when (item) {
+                            viewModel.textDecisionScope?.name -> {
+                                OffersSectionText(sectionName = "Text Offers")
+                                TextOffers(
+                                    offers = viewModel.optimizePropositionStateMap[viewModel.textDecisionScope?.name]?.offers,
+                                    listState = listState,
+                                    shouldCallDisplayProposition = !shouldBatchDisplayPropositions.value
+                                )
+                            }
+
+                            viewModel.imageDecisionScope?.name -> {
+                                OffersSectionText(sectionName = "Image Offers")
+                                ImageOffers(
+                                    offers = viewModel.optimizePropositionStateMap[viewModel.imageDecisionScope?.name]?.offers,
+                                    listState = listState
+                                )
+                            }
+
+                            viewModel.htmlDecisionScope?.name -> {
+                                OffersSectionText(sectionName = "HTML Offers")
+                                HTMLOffers(
+                                    offers = viewModel.optimizePropositionStateMap[viewModel.htmlDecisionScope?.name]?.offers,
+                                    listState = listState
+                                )
+                            }
+
+                            viewModel.jsonDecisionScope?.name -> {
+                                OffersSectionText(sectionName = "JSON Offers")
+                                JSONOffers(
+                                    offers = viewModel.optimizePropositionStateMap[viewModel.jsonDecisionScope?.name]?.offers,
+                                    listState = listState,
+                                    shouldCallDisplayProposition = !shouldBatchDisplayPropositions.value
+                                )
+                            }
+
+                            viewModel.targetMboxDecisionScope?.name -> {
+                                OffersSectionText(sectionName = "Target Offers")
+                                TargetOffersView(
+                                    offers = viewModel.optimizePropositionStateMap[viewModel.targetMboxDecisionScope?.name]?.offers,
+                                    listState = listState,
+                                    shouldCallDisplayProposition = !shouldBatchDisplayPropositions.value
+                                )
+                            }
                         }
-                        viewModel.imageDecisionScope?.name -> {
-                            OffersSectionText(sectionName = "Image Offers")
-                            ImageOffers(offers = viewModel.optimizePropositionStateMap[viewModel.imageDecisionScope?.name]?.offers, listState = listState)
-                        }
-                        viewModel.htmlDecisionScope?.name -> {
-                            OffersSectionText(sectionName = "HTML Offers")
-                            HTMLOffers(offers = viewModel.optimizePropositionStateMap[viewModel.htmlDecisionScope?.name]?.offers, listState = listState)
-                        }
-                        viewModel.jsonDecisionScope?.name -> {
-                            OffersSectionText(sectionName = "JSON Offers")
-                            JSONOffers(offers = viewModel.optimizePropositionStateMap[viewModel.jsonDecisionScope?.name]?.offers, listState = listState)
-                        }
-                        viewModel.targetMboxDecisionScope?.name -> {
-                            OffersSectionText(sectionName = "Target Offers")
-                            TargetOffersView(offers = viewModel.optimizePropositionStateMap[viewModel.targetMboxDecisionScope?.name]?.offers, listState = listState)
-                        }
-                    }
-                })
+                    })
             }.also {
-                // uncomment this if you want to send the displayPropositions in batches to the Edge network and don't forget to comment all the displayHandler calls
-                // displayPropositionsHandler(viewModel.optimizePropositionStateMap.values.toList())
+                if (shouldBatchDisplayPropositions.value) {
+                    displayPropositionsHandler(viewModel.optimizePropositionStateMap.values.toList())
+                }
             }
         }
 
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.005f)
+                .background(color = Color.Gray)
+        )
 
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(horizontal = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Batch display propositions : ",
+                modifier = Modifier
+                    .background(color = Color.White)
+                    .padding(10.dp),
+                textAlign = TextAlign.Left,
+                style = MaterialTheme.typography.subtitle1
+            )
+
+            Switch(
+                checked = shouldBatchDisplayPropositions.value,
+                onCheckedChange = { shouldBatchDisplayPropositions.value = it })
+        }
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
@@ -135,11 +191,12 @@ fun OffersView(viewModel: MainViewModel) {
         Surface(
             elevation = 1.5.dp
         ) {
-            Box(modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .fillMaxWidth()
-                .fillMaxHeight()
-                ) {
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+            ) {
                 Button(modifier = Modifier.align(Alignment.CenterStart), onClick = {
                     viewModel.updateDecisionScopes()
                     val decisionScopeList = arrayListOf<DecisionScope>()
@@ -151,13 +208,19 @@ fun OffersView(viewModel: MainViewModel) {
 
                     // Send a custom Identity in IdentityMap as primary identifier to Edge network in personalization query request.
                     val identityMap = IdentityMap()
-                    identityMap.addItem(IdentityItem("1111", AuthenticatedState.AUTHENTICATED, true), "userCRMID")
+                    identityMap.addItem(
+                        IdentityItem(
+                            "1111",
+                            AuthenticatedState.AUTHENTICATED,
+                            true
+                        ), "userCRMID"
+                    )
                     Identity.updateIdentities(identityMap)
 
                     val data = mutableMapOf<String, Any>()
                     val targetParams = mutableMapOf<String, String>()
 
-                    if(viewModel.targetMboxDecisionScope?.name?.isNotEmpty() == true) {
+                    if (viewModel.targetMboxDecisionScope?.name?.isNotEmpty() == true) {
                         viewModel.targetParamsMbox.forEach {
                             if (it.key.isNotEmpty() && it.value.isNotEmpty()) {
                                 targetParams[it.key] = it.value
@@ -165,20 +228,20 @@ fun OffersView(viewModel: MainViewModel) {
                         }
 
                         viewModel.targetParamsProfile.forEach {
-                            if(!it.key.isNullOrEmpty() && !it.value.isNullOrEmpty()){
+                            if (!it.key.isNullOrEmpty() && !it.value.isNullOrEmpty()) {
                                 targetParams[it.key] = it.value
                             }
                         }
 
-                        if(viewModel.isValidOrder){
+                        if (viewModel.isValidOrder) {
                             targetParams["orderId"] = viewModel.textTargetOrderId
                             targetParams["orderTotal"] = viewModel.textTargetOrderTotal
                             targetParams["purchasedProductIds"] = viewModel.textTargetPurchaseId
                         }
 
-                        if(viewModel.isValidProduct){
+                        if (viewModel.isValidProduct) {
                             targetParams["productId"] = viewModel.textTargetProductId
-                        targetParams["categoryId"] = viewModel.textTargetProductCategoryId
+                            targetParams["categoryId"] = viewModel.textTargetProductCategoryId
                         }
 
                         if (targetParams.isNotEmpty()) {
@@ -232,7 +295,6 @@ fun OffersView(viewModel: MainViewModel) {
 }
 
 
-
 @Composable
 fun OffersSectionText(sectionName: String) {
     Text(
@@ -247,7 +309,12 @@ fun OffersSectionText(sectionName: String) {
 }
 
 @Composable
-fun TextOffers(offers: List<Offer>? = null, placeholder: String = "Placeholder Text", listState: LazyListState? = null) {
+fun TextOffers(
+    offers: List<Offer>? = null,
+    placeholder: String = "Placeholder Text",
+    listState: LazyListState? = null,
+    shouldCallDisplayProposition: Boolean
+) {
 
     offers?.let { offersList ->
         offersList.forEach { offer ->
@@ -266,18 +333,29 @@ fun TextOffers(offers: List<Offer>? = null, placeholder: String = "Placeholder T
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
+                .map { visibleItemKeys ->
+                    visibleItemKeys.contains(
+                        offers?.get(0)?.propositionReference?.get()?.scope ?: ""
+                    )
+                }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
-                    offers?.forEach(displayHandler)
+                    if (shouldCallDisplayProposition) {
+                        offers?.forEach(displayHandler)
+                    }
                 }
         }
     }
 }
 
 @Composable
-fun JSONOffers(offers: List<Offer>? = null, placeholder: String = """{"placeholder": true}""", listState: LazyListState? = null) {
+fun JSONOffers(
+    offers: List<Offer>? = null,
+    placeholder: String = """{"placeholder": true}""",
+    listState: LazyListState? = null,
+    shouldCallDisplayProposition: Boolean
+) {
 
     offers?.let { offersList ->
         offersList.forEach { offer ->
@@ -296,11 +374,17 @@ fun JSONOffers(offers: List<Offer>? = null, placeholder: String = """{"placehold
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
+                .map { visibleItemKeys ->
+                    visibleItemKeys.contains(
+                        offers?.get(0)?.propositionReference?.get()?.scope ?: ""
+                    )
+                }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
-                    offers?.forEach(displayHandler)
+                    if (shouldCallDisplayProposition) {
+                        offers?.forEach(displayHandler)
+                    }
                 }
         }
     }
@@ -318,7 +402,8 @@ fun TextOffer(offer: Offer) {
                 clickHandler(offer)
             },
         style = MaterialTheme.typography.body1,
-        textAlign = TextAlign.Center)
+        textAlign = TextAlign.Center
+    )
 }
 
 @Composable
@@ -355,7 +440,11 @@ fun ImageOffers(offers: List<Offer>? = null, listState: LazyListState? = null) {
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
+                .map { visibleItemKeys ->
+                    visibleItemKeys.contains(
+                        offers?.get(0)?.propositionReference?.get()?.scope ?: ""
+                    )
+                }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
@@ -366,25 +455,34 @@ fun ImageOffers(offers: List<Offer>? = null, listState: LazyListState? = null) {
 }
 
 @Composable
-fun HTMLOffers(offers: List<Offer>?= null, placeholderHtml: String = "<html><body><p style=\"color:green; font-size:20px;position: absolute;top: 50%;left: 50%;margin-right: -50%;transform: translate(-50%, -50%)\">Placeholder Html</p></body></html>", listState: LazyListState? = null) {
-        Column(modifier = Modifier
+fun HTMLOffers(
+    offers: List<Offer>? = null,
+    placeholderHtml: String = "<html><body><p style=\"color:green; font-size:20px;position: absolute;top: 50%;left: 50%;margin-right: -50%;transform: translate(-50%, -50%)\">Placeholder Html</p></body></html>",
+    listState: LazyListState? = null
+) {
+    Column(
+        modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            offers?.onEach {
-                HtmlOfferWebView(html = it.content, onclick = {
-                    clickHandler(it)
-                    }
-                )
-            } ?: HtmlOfferWebView(html = placeholderHtml)
-        }
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        offers?.onEach {
+            HtmlOfferWebView(html = it.content, onclick = {
+                clickHandler(it)
+            }
+            )
+        } ?: HtmlOfferWebView(html = placeholderHtml)
+    }
 
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
+                .map { visibleItemKeys ->
+                    visibleItemKeys.contains(
+                        offers?.get(0)?.propositionReference?.get()?.scope ?: ""
+                    )
+                }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
@@ -412,32 +510,51 @@ fun HtmlOfferWebView(html: String, onclick: (() -> Unit)? = null) {
             }
         }
     }, update = {
-            it.loadData(html, "text/html", "UTF-8")
-        }
+        it.loadData(html, "text/html", "UTF-8")
+    }
     )
 }
 
 @Composable
-fun TargetOffersView(offers: List<Offer>? = null, listState: LazyListState? = null) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight()) {
+fun TargetOffersView(
+    offers: List<Offer>? = null,
+    listState: LazyListState? = null,
+    shouldCallDisplayProposition: Boolean
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+    ) {
         offers?.onEach {
             when (it.type) {
-                OfferType.HTML -> HtmlOfferWebView(html = it.content, onclick = {clickHandler(it)})
-                else -> Text(text = it.content, modifier = Modifier
-                    .padding(vertical = 20.dp)
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .clickable { clickHandler(it) }, textAlign = TextAlign.Center)
+                OfferType.HTML -> HtmlOfferWebView(
+                    html = it.content,
+                    onclick = { clickHandler(it) })
+
+                else -> Text(
+                    text = it.content, modifier = Modifier
+                        .padding(vertical = 20.dp)
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .clickable { clickHandler(it) }, textAlign = TextAlign.Center
+                )
             }
-        } ?: TextOffers(offers = null, placeholder = "Placeholder Target Text")
+        } ?: TextOffers(
+            offers = null,
+            placeholder = "Placeholder Target Text",
+            shouldCallDisplayProposition = shouldCallDisplayProposition
+        )
     }
 
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
+                .map { visibleItemKeys ->
+                    visibleItemKeys.contains(
+                        offers?.get(0)?.propositionReference?.get()?.scope ?: ""
+                    )
+                }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
