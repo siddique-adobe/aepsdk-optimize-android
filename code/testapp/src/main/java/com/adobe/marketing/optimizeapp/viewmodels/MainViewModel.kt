@@ -44,6 +44,8 @@ class MainViewModel: ViewModel() {
 
     var optimizePropositionStateMap = mutableStateMapOf<String, OptimizeProposition>()
 
+    var shouldBatchDisplayPropositions by mutableStateOf(false)
+
     private val optimizePropositionUpdateCallback = object : AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>> {
         override fun call(propositions: Map<DecisionScope, OptimizeProposition>?) {
             propositions?.forEach {

@@ -26,8 +26,6 @@ import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,7 +64,6 @@ private val displayPropositionsHandler: (List<OptimizeProposition>) -> Unit = { 
 
 @Composable
 fun OffersView(viewModel: MainViewModel) {
-    val shouldBatchDisplayPropositions = remember { mutableStateOf(false) }
     var listState = rememberLazyListState()
     Column(
         modifier = Modifier
@@ -82,15 +79,15 @@ fun OffersView(viewModel: MainViewModel) {
             ) {
 
                 OffersSectionText(sectionName = "Text Offers")
-                TextOffers(shouldCallDisplayProposition = !shouldBatchDisplayPropositions.value)
+                TextOffers(shouldCallDisplayProposition = !viewModel.shouldBatchDisplayPropositions)
                 OffersSectionText(sectionName = "Image Offers")
                 ImageOffers()
                 OffersSectionText(sectionName = "HTML Offers")
                 HTMLOffers()
                 OffersSectionText(sectionName = "JSON Offers")
-                JSONOffers(shouldCallDisplayProposition = !shouldBatchDisplayPropositions.value)
+                JSONOffers(shouldCallDisplayProposition = !viewModel.shouldBatchDisplayPropositions)
                 OffersSectionText(sectionName = "Target Offers")
-                TargetOffersView(shouldCallDisplayProposition = !shouldBatchDisplayPropositions.value)
+                TargetOffersView(shouldCallDisplayProposition = !viewModel.shouldBatchDisplayPropositions)
             }
         } else {
             LazyColumn(
@@ -109,7 +106,7 @@ fun OffersView(viewModel: MainViewModel) {
                                 TextOffers(
                                     offers = viewModel.optimizePropositionStateMap[viewModel.textDecisionScope?.name]?.offers,
                                     listState = listState,
-                                    shouldCallDisplayProposition = !shouldBatchDisplayPropositions.value
+                                    shouldCallDisplayProposition = !viewModel.shouldBatchDisplayPropositions
                                 )
                             }
 
@@ -134,7 +131,7 @@ fun OffersView(viewModel: MainViewModel) {
                                 JSONOffers(
                                     offers = viewModel.optimizePropositionStateMap[viewModel.jsonDecisionScope?.name]?.offers,
                                     listState = listState,
-                                    shouldCallDisplayProposition = !shouldBatchDisplayPropositions.value
+                                    shouldCallDisplayProposition = !viewModel.shouldBatchDisplayPropositions
                                 )
                             }
 
@@ -143,13 +140,13 @@ fun OffersView(viewModel: MainViewModel) {
                                 TargetOffersView(
                                     offers = viewModel.optimizePropositionStateMap[viewModel.targetMboxDecisionScope?.name]?.offers,
                                     listState = listState,
-                                    shouldCallDisplayProposition = !shouldBatchDisplayPropositions.value
+                                    shouldCallDisplayProposition = !viewModel.shouldBatchDisplayPropositions
                                 )
                             }
                         }
                     })
             }.also {
-                if (shouldBatchDisplayPropositions.value) {
+                if (viewModel.shouldBatchDisplayPropositions) {
                     displayPropositionsHandler(viewModel.optimizePropositionStateMap.values.toList())
                 }
             }
@@ -179,8 +176,8 @@ fun OffersView(viewModel: MainViewModel) {
             )
 
             Switch(
-                checked = shouldBatchDisplayPropositions.value,
-                onCheckedChange = { shouldBatchDisplayPropositions.value = it })
+                checked = viewModel.shouldBatchDisplayPropositions,
+                onCheckedChange = { viewModel.shouldBatchDisplayPropositions = it })
         }
         Spacer(
             modifier = Modifier
