@@ -57,8 +57,8 @@ private val displayHandler: (Offer) -> Unit = { offer ->
     offer.displayed()
 }
 
-private val displayPropositionsHandler: (List<OptimizeProposition>) -> Unit = { props ->
-    trackDisplayedPropositions(props)
+private val displayPropositionsHandler: (List<Offer>) -> Unit = { offers ->
+    //trackDisplayedPropositions(props)
 }
 
 @Composable
