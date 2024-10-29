@@ -42,8 +42,6 @@ import com.adobe.marketing.mobile.edge.identity.IdentityMap
 import com.adobe.marketing.mobile.optimize.DecisionScope
 import com.adobe.marketing.mobile.optimize.Offer
 import com.adobe.marketing.mobile.optimize.OfferType
-import com.adobe.marketing.mobile.optimize.Optimize.trackDisplayedPropositions
-import com.adobe.marketing.mobile.optimize.OptimizeProposition
 import com.adobe.marketing.optimizeapp.viewmodels.MainViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -267,7 +265,7 @@ fun TextOffers(offers: List<Offer>? = null, placeholder: String = "Placeholder T
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.proposition?.scope ?: "") }
+                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
@@ -297,7 +295,7 @@ fun JSONOffers(offers: List<Offer>? = null, placeholder: String = """{"placehold
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.proposition?.scope ?: "") }
+                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
@@ -356,7 +354,7 @@ fun ImageOffers(offers: List<Offer>? = null, listState: LazyListState? = null) {
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.proposition?.scope ?: "") }
+                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
@@ -385,7 +383,7 @@ fun HTMLOffers(offers: List<Offer>?= null, placeholderHtml: String = "<html><bod
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.proposition?.scope ?: "") }
+                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
@@ -438,7 +436,7 @@ fun TargetOffersView(offers: List<Offer>? = null, listState: LazyListState? = nu
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.proposition?.scope ?: "") }
+                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
