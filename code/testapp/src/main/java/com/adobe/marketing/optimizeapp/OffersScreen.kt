@@ -13,12 +13,27 @@ package com.adobe.marketing.optimizeapp
 
 import android.view.ViewGroup
 import android.webkit.WebView
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absolutePadding
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -41,7 +56,7 @@ import com.adobe.marketing.mobile.edge.identity.IdentityItem
 import com.adobe.marketing.mobile.edge.identity.IdentityMap
 import com.adobe.marketing.mobile.optimize.DecisionScope
 import com.adobe.marketing.mobile.optimize.Offer
-import com.adobe.marketing.mobile.optimize.Offer.Companion.displayed
+import com.adobe.marketing.mobile.optimize.OfferExtension.displayed
 import com.adobe.marketing.mobile.optimize.OfferType
 import com.adobe.marketing.optimizeapp.viewmodels.MainViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -266,7 +281,7 @@ fun TextOffers(offers: List<Offer>? = null, placeholder: String = "Placeholder T
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
+                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.proposition?.scope ?: "") }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
@@ -296,7 +311,7 @@ fun JSONOffers(offers: List<Offer>? = null, placeholder: String = """{"placehold
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
+                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.proposition?.scope ?: "") }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
@@ -355,7 +370,7 @@ fun ImageOffers(offers: List<Offer>? = null, listState: LazyListState? = null) {
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
+                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.proposition?.scope ?: "") }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
@@ -384,7 +399,7 @@ fun HTMLOffers(offers: List<Offer>?= null, placeholderHtml: String = "<html><bod
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
+                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.proposition?.scope ?: "") }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
@@ -437,7 +452,7 @@ fun TargetOffersView(offers: List<Offer>? = null, listState: LazyListState? = nu
     listState?.also {
         LaunchedEffect(it) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.propositionReference?.get()?.scope ?: "") }
+                .map { visibleItemKeys -> visibleItemKeys.contains(offers?.get(0)?.proposition?.scope ?: "") }
                 .distinctUntilChanged()
                 .filter { result -> result }
                 .collect {
