@@ -19,18 +19,20 @@ object OfferExtension {
     fun List<Offer>?.generateDisplayInteractionXdm(): Map<String, Any>? {
         return OptimizeUtils.generateInteractionXdm(
             OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
-            this?.toPropositionsList()
+            this?.toUniquePropositionsList()
         )
     }
 
-    private fun List<Offer>?.toPropositionsList(): List<OptimizeProposition>? {
-        val propositions = this
-            ?.mapNotNull { it.propositionReference?.get() }
-            .takeIf { !it.isNullOrEmpty() }
-        return propositions?.filter { proposition ->
-            proposition.offers.any { offerInProp ->
-                this?.any { it.id == offerInProp.id } == true
-            }
-        }
+    private fun List<Offer>?.toUniquePropositionsList(): List<OptimizeProposition>? {
+        if (this.isNullOrEmpty()) return null
+        val seenPropsIds = mutableSetOf<String>()
+        val offerIds = this.mapNotNull { it.id }.toSet()
+        return this
+            .mapNotNull { it.propositionReference?.get() }
+            .filter { proposition ->
+                with(proposition) {
+                    id !in seenPropsIds && offers.any { it.id in offerIds }
+                }
+            }.onEach { seenPropsIds.add(it.id) }
     }
 }
