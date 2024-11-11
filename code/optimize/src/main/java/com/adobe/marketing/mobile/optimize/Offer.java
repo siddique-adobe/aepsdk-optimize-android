@@ -285,6 +285,17 @@ public class Offer {
 
     /**
      * Dispatches an event for the Edge network extension to send an Experience Event to the Edge
+     * network with the display interaction data for the given {@code OptimizeProposition} list of
+     * offers.
+     *
+     * @see OptimizeUtils#trackWithData(Map)
+     */
+    public void displayed(List<Offer> offers) {
+        OfferExtension.displayed(offers);
+    }
+
+    /**
+     * Dispatches an event for the Edge network extension to send an Experience Event to the Edge
      * network with the tap interaction data for the given {@code OptimizeProposition} offer.
      *
      * @see OptimizeUtils#trackWithData(Map)
@@ -313,6 +324,24 @@ public class Offer {
         return OptimizeUtils.generateInteractionXdm(
                 OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
                 Collections.singletonList(propositionReference.get()));
+    }
+
+    /**
+     * Generates a map containing XDM formatted data for {@code Experience Event -
+     * OptimizeProposition Interactions} field group from this {@code OptimizeProposition} item.
+     *
+     * <p>The returned XDM data does contain the {@code eventType} for the Experience Event with
+     * value {@code decisioning.propositionDisplay}.
+     *
+     * <p>Note: The Edge sendEvent API can be used to dispatch this data in an Experience Event
+     * along with any additional XDM, free-form data, and override dataset identifier.
+     *
+     * @param offers {@code List<Offer>} containing offer data.
+     * @return {@code Map<String, Object>} containing the XDM data for the proposition interaction.
+     * @see OfferExtension#generateDisplayInteractionXdm(List)
+     */
+    public Map<String, Object> generateDisplayInteractionXdm(List<Offer> offers) {
+        return OfferExtension.generateDisplayInteractionXdm(offers);
     }
 
     /**

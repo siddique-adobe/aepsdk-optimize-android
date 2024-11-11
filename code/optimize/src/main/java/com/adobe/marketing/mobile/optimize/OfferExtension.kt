@@ -12,10 +12,12 @@
 package com.adobe.marketing.mobile.optimize
 
 object OfferExtension {
+    @JvmStatic
     fun List<Offer>?.displayed() {
         OptimizeUtils.trackWithData(this.generateDisplayInteractionXdm())
     }
 
+    @JvmStatic
     fun List<Offer>?.generateDisplayInteractionXdm(): Map<String, Any>? {
         return OptimizeUtils.generateInteractionXdm(
             OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
