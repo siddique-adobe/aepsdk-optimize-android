@@ -61,6 +61,29 @@ public class Optimize {
     public static void updatePropositions(
             @NonNull final List<DecisionScope> decisionScopes,
             @Nullable final Map<String, Object> xdm,
+            @Nullable final Map<String, Object> data) {
+        final long defaultTimeout = OptimizeConstants.EDGE_CONTENT_COMPLETE_RESPONSE_TIMEOUT;
+        updatePropositions(decisionScopes, xdm, data, defaultTimeout, null);
+    }
+
+    /**
+     * This API dispatches an Event for the Edge network extension to fetch decision propositions,
+     * for the provided decision scopes list, from the decisioning services enabled in the
+     * Experience Edge network.
+     *
+     * <p>The returned decision propositions are cached in-memory in the Optimize SDK extension and
+     * can be retrieved using {@link #getPropositions(List, long, AdobeCallback)} API.
+     *
+     * @param decisionScopes {@code List<DecisionScope>} containing scopes for which offers need to
+     *     be updated.
+     * @param xdm {@code Map<String, Object>} containing additional XDM-formatted data to be sent in
+     *     the personalization query request.
+     * @param data {@code Map<String, Object>} containing additional free-form data to be sent in
+     *     the personalization query request.
+     */
+    public static void updatePropositions(
+            @NonNull final List<DecisionScope> decisionScopes,
+            @Nullable final Map<String, Object> xdm,
             @Nullable final Map<String, Object> data,
             final long timeout) {
 
