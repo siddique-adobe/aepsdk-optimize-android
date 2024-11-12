@@ -56,7 +56,7 @@ import com.adobe.marketing.mobile.edge.identity.IdentityItem
 import com.adobe.marketing.mobile.edge.identity.IdentityMap
 import com.adobe.marketing.mobile.optimize.DecisionScope
 import com.adobe.marketing.mobile.optimize.Offer
-import com.adobe.marketing.mobile.optimize.OfferExtension.displayed
+import com.adobe.marketing.mobile.optimize.Offer.displayed
 import com.adobe.marketing.mobile.optimize.OfferType
 import com.adobe.marketing.optimizeapp.viewmodels.MainViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -72,7 +72,7 @@ private val displayHandler: (Offer) -> Unit = { offer ->
 }
 
 private val displayPropositionsHandler: (List<Offer>) -> Unit = { offers ->
-    offers.displayed()
+    displayed(offers)
 }
 
 @Composable

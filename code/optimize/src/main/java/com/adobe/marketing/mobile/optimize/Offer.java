@@ -11,6 +11,8 @@
 
 package com.adobe.marketing.mobile.optimize;
 
+import static com.adobe.marketing.mobile.optimize.OfferExtension.toUniquePropositionsList;
+
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
 import com.adobe.marketing.mobile.util.DataReaderException;
@@ -285,13 +287,13 @@ public class Offer {
 
     /**
      * Dispatches an event for the Edge network extension to send an Experience Event to the Edge
-     * network with the display interaction data for the given {@code OptimizeProposition} list of
-     * offers.
+     * network with the display interaction data for the given {@code offer} list of offers.
      *
+     * @param offers {@code List<Offer>} containing offer data.
      * @see OptimizeUtils#trackWithData(Map)
      */
-    public void displayed(List<Offer> offers) {
-        OfferExtension.displayed(offers);
+    public static void displayed(List<Offer> offers) {
+        OptimizeUtils.trackWithData(generateDisplayInteractionXdm(offers));
     }
 
     /**
@@ -328,7 +330,7 @@ public class Offer {
 
     /**
      * Generates a map containing XDM formatted data for {@code Experience Event -
-     * OptimizeProposition Interactions} field group from this {@code OptimizeProposition} item.
+     * OptimizeProposition Interactions} field group from this {@code offer} list.
      *
      * <p>The returned XDM data does contain the {@code eventType} for the Experience Event with
      * value {@code decisioning.propositionDisplay}.
@@ -338,10 +340,20 @@ public class Offer {
      *
      * @param offers {@code List<Offer>} containing offer data.
      * @return {@code Map<String, Object>} containing the XDM data for the proposition interaction.
-     * @see OfferExtension#generateDisplayInteractionXdm(List)
+     * @see OptimizeUtils#generateInteractionXdm(String, List)
      */
-    public Map<String, Object> generateDisplayInteractionXdm(List<Offer> offers) {
-        return OfferExtension.generateDisplayInteractionXdm(offers);
+    public static Map<String, Object> generateDisplayInteractionXdm(List<Offer> offers) {
+        List<OptimizeProposition> propositions = toUniquePropositionsList(offers);
+        if (propositions != null && !propositions.isEmpty()) {
+            return OptimizeUtils.generateInteractionXdm(
+                    OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY, propositions);
+        }
+        Log.debug(
+                OptimizeConstants.LOG_TAG,
+                SELF_TAG,
+                "Cannot generate XDM, provided list of offers belongs to null or empty"
+                        + " propositions");
+        return null;
     }
 
     /**

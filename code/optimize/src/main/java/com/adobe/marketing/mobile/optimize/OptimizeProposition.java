@@ -11,8 +11,6 @@
 
 package com.adobe.marketing.mobile.optimize;
 
-import static com.adobe.marketing.mobile.optimize.OfferExtension.displayed;
-
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
 import java.lang.ref.SoftReference;
@@ -163,7 +161,6 @@ public class OptimizeProposition {
                     DataReader.getTypedListOfMap(
                             Object.class, data, OptimizeConstants.JsonKeys.PAYLOAD_ITEMS);
             List<Offer> offers = new ArrayList<>();
-            displayed(offers);
             if (items != null) {
                 for (Map<String, Object> item : items) {
                     final Offer offer = Offer.fromEventData(item);

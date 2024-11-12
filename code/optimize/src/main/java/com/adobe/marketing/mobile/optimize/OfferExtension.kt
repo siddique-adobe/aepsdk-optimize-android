@@ -11,21 +11,9 @@
 
 package com.adobe.marketing.mobile.optimize
 
-object OfferExtension {
+internal object OfferExtension {
     @JvmStatic
-    fun List<Offer>?.displayed() {
-        OptimizeUtils.trackWithData(this.generateDisplayInteractionXdm())
-    }
-
-    @JvmStatic
-    fun List<Offer>?.generateDisplayInteractionXdm(): Map<String, Any>? {
-        return OptimizeUtils.generateInteractionXdm(
-            OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
-            this?.toUniquePropositionsList()
-        )
-    }
-
-    private fun List<Offer>?.toUniquePropositionsList(): List<OptimizeProposition>? {
+    fun List<Offer>?.toUniquePropositionsList(): List<OptimizeProposition>? {
         if (this.isNullOrEmpty()) return null
         val seenPropsIds = mutableSetOf<String>()
         val offerIds = this.mapNotNull { it.id }.toSet()
@@ -35,6 +23,15 @@ object OfferExtension {
                 with(proposition) {
                     id !in seenPropsIds && offers.any { it.id in offerIds }
                 }
-            }.onEach { seenPropsIds.add(it.id) }
+            }.onEach { proposition ->
+                seenPropsIds.add(proposition.id)
+                val filteredOffers = proposition.offers.filter { it.id in offerIds }
+                OptimizeProposition(
+                    proposition.id,
+                    filteredOffers,
+                    proposition.scope,
+                    proposition.scopeDetails
+                )
+            }
     }
 }
