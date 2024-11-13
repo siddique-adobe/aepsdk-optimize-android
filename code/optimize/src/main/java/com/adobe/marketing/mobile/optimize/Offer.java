@@ -11,6 +11,8 @@
 
 package com.adobe.marketing.mobile.optimize;
 
+import static com.adobe.marketing.mobile.optimize.OfferExtension.toUniquePropositionsList;
+
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
 import com.adobe.marketing.mobile.util.DataReaderException;
@@ -285,6 +287,17 @@ public class Offer {
 
     /**
      * Dispatches an event for the Edge network extension to send an Experience Event to the Edge
+     * network with the display interaction data for the given {@code offer} list of offers.
+     *
+     * @param offers {@code List<Offer>} containing offer data.
+     * @see OptimizeUtils#trackWithData(Map)
+     */
+    public static void displayed(List<Offer> offers) {
+        OptimizeUtils.trackWithData(generateDisplayInteractionXdm(offers));
+    }
+
+    /**
+     * Dispatches an event for the Edge network extension to send an Experience Event to the Edge
      * network with the tap interaction data for the given {@code OptimizeProposition} offer.
      *
      * @see OptimizeUtils#trackWithData(Map)
@@ -304,7 +317,7 @@ public class Offer {
      * along with any additional XDM, free-form data, and override dataset identifier.
      *
      * @return {@code Map<String, Object>} containing the XDM data for the proposition interaction.
-     * @see OptimizeUtils#generateInteractionXdm(String, List, Boolean)
+     * @see OptimizeUtils#generateInteractionXdm(String, List)
      */
     public Map<String, Object> generateDisplayInteractionXdm() {
         if (propositionReference == null || propositionReference.get() == null) {
@@ -312,8 +325,35 @@ public class Offer {
         }
         return OptimizeUtils.generateInteractionXdm(
                 OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
-                Collections.singletonList(propositionReference.get()),
-                true);
+                Collections.singletonList(propositionReference.get()));
+    }
+
+    /**
+     * Generates a map containing XDM formatted data for {@code Experience Event -
+     * OptimizeProposition Interactions} field group from this {@code offer} list.
+     *
+     * <p>The returned XDM data does contain the {@code eventType} for the Experience Event with
+     * value {@code decisioning.propositionDisplay}.
+     *
+     * <p>Note: The Edge sendEvent API can be used to dispatch this data in an Experience Event
+     * along with any additional XDM, free-form data, and override dataset identifier.
+     *
+     * @param offers {@code List<Offer>} containing offer data.
+     * @return {@code Map<String, Object>} containing the XDM data for the proposition interaction.
+     * @see OptimizeUtils#generateInteractionXdm(String, List)
+     */
+    public static Map<String, Object> generateDisplayInteractionXdm(List<Offer> offers) {
+        List<OptimizeProposition> propositions = toUniquePropositionsList(offers);
+        if (propositions != null && !propositions.isEmpty()) {
+            return OptimizeUtils.generateInteractionXdm(
+                    OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY, propositions);
+        }
+        Log.debug(
+                OptimizeConstants.LOG_TAG,
+                SELF_TAG,
+                "Cannot generate XDM, provided list of offers belongs to null or empty"
+                        + " propositions");
+        return null;
     }
 
     /**
@@ -327,7 +367,7 @@ public class Offer {
      * along with any additional XDM, free-form data, and override dataset identifier.
      *
      * @return {@code Map<String, Object>} containing the XDM data for the proposition interaction.
-     * @see OptimizeUtils#generateInteractionXdm(String, List, Boolean)
+     * @see OptimizeUtils#generateInteractionXdm(String, List)
      */
     public Map<String, Object> generateTapInteractionXdm() {
         if (propositionReference == null || propositionReference.get() == null) {
@@ -335,8 +375,7 @@ public class Offer {
         }
         return OptimizeUtils.generateInteractionXdm(
                 OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_INTERACT,
-                Collections.singletonList(propositionReference.get()),
-                true);
+                Collections.singletonList(propositionReference.get()));
     }
 
     /**
