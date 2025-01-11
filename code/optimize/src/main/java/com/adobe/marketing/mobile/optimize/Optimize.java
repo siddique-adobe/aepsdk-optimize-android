@@ -14,23 +14,13 @@ package com.adobe.marketing.mobile.optimize;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.adobe.marketing.mobile.AdobeCallback;
-import com.adobe.marketing.mobile.AdobeCallbackWithError;
-import com.adobe.marketing.mobile.AdobeError;
-import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.Extension;
-import com.adobe.marketing.mobile.MobileCore;
-import com.adobe.marketing.mobile.services.Log;
-import com.adobe.marketing.mobile.util.DataReader;
-import com.adobe.marketing.mobile.util.DataReaderException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /** Public class containing APIs for the Optimize extension. */
 public class Optimize {
     public static final Class<? extends Extension> EXTENSION = OptimizeExtension.class;
-    private static final String SELF_TAG = "Optimize";
 
     private Optimize() {}
 
@@ -89,9 +79,7 @@ public class Optimize {
             @Nullable final Map<String, Object> xdm,
             @Nullable final Map<String, Object> data,
             @Nullable final AdobeCallback<Map<DecisionScope, OptimizeProposition>> callback) {
-        final double defaultTimeoutSeconds =
-                OptimizeConstants.EDGE_CONTENT_COMPLETE_RESPONSE_TIMEOUT;
-        updatePropositionsInternal(decisionScopes, xdm, data, defaultTimeoutSeconds, callback);
+        OptimizeImpl.INSTANCE.updatePropositionsInternal(decisionScopes, xdm, data, callback);
     }
 
     /**
@@ -119,153 +107,8 @@ public class Optimize {
             @Nullable final Map<String, Object> data,
             final double timeoutSeconds,
             @Nullable final AdobeCallback<Map<DecisionScope, OptimizeProposition>> callback) {
-        updatePropositionsInternal(decisionScopes, xdm, data, timeoutSeconds, callback);
-    }
-
-    private static void updatePropositionsInternal(
-            @NonNull final List<DecisionScope> decisionScopes,
-            @Nullable final Map<String, Object> xdm,
-            @Nullable final Map<String, Object> data,
-            final double timeoutSeconds,
-            @Nullable final AdobeCallback<Map<DecisionScope, OptimizeProposition>> callback) {
-
-        if (OptimizeUtils.isNullOrEmpty(decisionScopes)) {
-            Log.warning(
-                    OptimizeConstants.LOG_TAG,
-                    SELF_TAG,
-                    "Cannot update propositions, provided list of decision scopes is null or"
-                            + " empty.");
-
-            AEPOptimizeError aepOptimizeError = AEPOptimizeError.Companion.getUnexpectedError();
-            failWithOptimizeError(callback, aepOptimizeError);
-
-            return;
-        }
-
-        final List<DecisionScope> validScopes = new ArrayList<>();
-        for (final DecisionScope scope : decisionScopes) {
-            if (!scope.isValid()) {
-                continue;
-            }
-            validScopes.add(scope);
-        }
-
-        if (validScopes.size() == 0) {
-            Log.warning(
-                    OptimizeConstants.LOG_TAG,
-                    SELF_TAG,
-                    "Cannot update propositions, provided list of decision scopes has no valid"
-                            + " scope.");
-            return;
-        }
-
-        final List<Map<String, Object>> flattenedDecisionScopes = new ArrayList<>();
-        for (final DecisionScope scope : validScopes) {
-            flattenedDecisionScopes.add(scope.toEventData());
-        }
-
-        final Map<String, Object> eventData = new HashMap<>();
-        eventData.put(
-                OptimizeConstants.EventDataKeys.REQUEST_TYPE,
-                OptimizeConstants.EventDataValues.REQUEST_TYPE_UPDATE);
-        eventData.put(OptimizeConstants.EventDataKeys.DECISION_SCOPES, flattenedDecisionScopes);
-
-        if (!OptimizeUtils.isNullOrEmpty(xdm)) {
-            eventData.put(OptimizeConstants.EventDataKeys.XDM, xdm);
-        }
-
-        if (!OptimizeUtils.isNullOrEmpty(data)) {
-            eventData.put(OptimizeConstants.EventDataKeys.DATA, data);
-        }
-
-        long timeoutMillis = (long) (timeoutSeconds * OptimizeConstants.TIMEOUT_CONVERSION_FACTOR);
-
-        eventData.put(OptimizeConstants.EventDataKeys.TIMEOUT, timeoutMillis);
-
-        final Event event =
-                new Event.Builder(
-                                OptimizeConstants.EventNames.UPDATE_PROPOSITIONS_REQUEST,
-                                OptimizeConstants.EventType.OPTIMIZE,
-                                OptimizeConstants.EventSource.REQUEST_CONTENT)
-                        .setEventData(eventData)
-                        .build();
-
-        MobileCore.dispatchEventWithResponseCallback(
-                event,
-                timeoutMillis,
-                new AdobeCallbackWithError<Event>() {
-                    @Override
-                    public void fail(final AdobeError adobeError) {
-                        AEPOptimizeError aepOptimizeError;
-                        if (adobeError == AdobeError.CALLBACK_TIMEOUT) {
-                            aepOptimizeError = AEPOptimizeError.Companion.getTimeoutError();
-                        } else {
-                            aepOptimizeError = AEPOptimizeError.Companion.getUnexpectedError();
-                        }
-                        failWithOptimizeError(callback, aepOptimizeError);
-                    }
-
-                    @Override
-                    public void call(final Event event) {
-                        try {
-                            final Map<String, Object> eventData = event.getEventData();
-                            if (OptimizeUtils.isNullOrEmpty(eventData)) {
-
-                                AEPOptimizeError aepOptimizeError =
-                                        AEPOptimizeError.Companion.getUnexpectedError();
-                                failWithOptimizeError(callback, aepOptimizeError);
-                                return;
-                            }
-
-                            if (eventData.containsKey(
-                                    OptimizeConstants.EventDataKeys.RESPONSE_ERROR)) {
-                                Object error =
-                                        eventData.get(
-                                                OptimizeConstants.EventDataKeys.RESPONSE_ERROR);
-                                if (error instanceof Map) {
-                                    failWithOptimizeError(
-                                            callback,
-                                            AEPOptimizeError.toAEPOptimizeError(
-                                                    (Map<String, ? extends Object>) error));
-                                }
-                            }
-
-                            if (!eventData.containsKey(
-                                    OptimizeConstants.EventDataKeys.PROPOSITIONS)) {
-                                return;
-                            }
-
-                            final List<Map<String, Object>> propositionsList;
-                            propositionsList =
-                                    DataReader.getTypedListOfMap(
-                                            Object.class,
-                                            eventData,
-                                            OptimizeConstants.EventDataKeys.PROPOSITIONS);
-                            final Map<DecisionScope, OptimizeProposition> propositionsMap =
-                                    new HashMap<>();
-                            if (propositionsList != null) {
-                                for (final Map<String, Object> propositionData : propositionsList) {
-                                    final OptimizeProposition optimizeProposition =
-                                            OptimizeProposition.fromEventData(propositionData);
-                                    if (optimizeProposition != null
-                                            && !OptimizeUtils.isNullOrEmpty(
-                                                    optimizeProposition.getScope())) {
-                                        final DecisionScope scope =
-                                                new DecisionScope(optimizeProposition.getScope());
-                                        propositionsMap.put(scope, optimizeProposition);
-                                    }
-                                }
-                            }
-
-                            if (callback != null) {
-                                callback.call(propositionsMap);
-                            }
-                        } catch (DataReaderException e) {
-                            failWithOptimizeError(
-                                    callback, AEPOptimizeError.Companion.getUnexpectedError());
-                        }
-                    }
-                });
+        OptimizeImpl.INSTANCE.updatePropositionsInternal(
+                decisionScopes, xdm, data, timeoutSeconds, callback);
     }
 
     /**
@@ -280,8 +123,7 @@ public class Optimize {
     public static void getPropositions(
             @NonNull final List<DecisionScope> decisionScopes,
             @NonNull final AdobeCallback<Map<DecisionScope, OptimizeProposition>> callback) {
-        final double defaultTimeoutSeconds = OptimizeConstants.GET_RESPONSE_CALLBACK_TIMEOUT;
-        getPropositionsInternal(decisionScopes, defaultTimeoutSeconds, callback);
+        OptimizeImpl.INSTANCE.getPropositionsInternal(decisionScopes, callback);
     }
 
     /**
@@ -297,117 +139,7 @@ public class Optimize {
             @NonNull final List<DecisionScope> decisionScopes,
             final double timeoutSeconds,
             @NonNull final AdobeCallback<Map<DecisionScope, OptimizeProposition>> callback) {
-        getPropositionsInternal(decisionScopes, timeoutSeconds, callback);
-    }
-
-    private static void getPropositionsInternal(
-            @NonNull final List<DecisionScope> decisionScopes,
-            final double timeoutSeconds,
-            @NonNull final AdobeCallback<Map<DecisionScope, OptimizeProposition>> callback) {
-        if (OptimizeUtils.isNullOrEmpty(decisionScopes)) {
-            Log.warning(
-                    OptimizeConstants.LOG_TAG,
-                    SELF_TAG,
-                    "Cannot get propositions, provided list of decision scopes is null or empty.");
-            failWithError(callback, AdobeError.UNEXPECTED_ERROR);
-            return;
-        }
-
-        final List<DecisionScope> validScopes = new ArrayList<>();
-        for (final DecisionScope scope : decisionScopes) {
-            if (!scope.isValid()) {
-                continue;
-            }
-            validScopes.add(scope);
-        }
-
-        if (validScopes.size() == 0) {
-            Log.warning(
-                    OptimizeConstants.LOG_TAG,
-                    SELF_TAG,
-                    "Cannot update propositions, provided list of decision scopes has no valid"
-                            + " scope.");
-            failWithError(callback, AdobeError.UNEXPECTED_ERROR);
-            return;
-        }
-
-        final List<Map<String, Object>> flattenedDecisionScopes = new ArrayList<>();
-        for (final DecisionScope scope : validScopes) {
-            flattenedDecisionScopes.add(scope.toEventData());
-        }
-
-        final Map<String, Object> eventData = new HashMap<>();
-        eventData.put(
-                OptimizeConstants.EventDataKeys.REQUEST_TYPE,
-                OptimizeConstants.EventDataValues.REQUEST_TYPE_GET);
-        eventData.put(OptimizeConstants.EventDataKeys.DECISION_SCOPES, flattenedDecisionScopes);
-
-        final Event event =
-                new Event.Builder(
-                                OptimizeConstants.EventNames.GET_PROPOSITIONS_REQUEST,
-                                OptimizeConstants.EventType.OPTIMIZE,
-                                OptimizeConstants.EventSource.REQUEST_CONTENT)
-                        .setEventData(eventData)
-                        .build();
-
-        long timeoutMillis = (long) (timeoutSeconds * OptimizeConstants.TIMEOUT_CONVERSION_FACTOR);
-
-        MobileCore.dispatchEventWithResponseCallback(
-                event,
-                timeoutMillis,
-                new AdobeCallbackWithError<Event>() {
-                    @Override
-                    public void fail(final AdobeError adobeError) {
-                        failWithError(callback, adobeError);
-                    }
-
-                    @Override
-                    public void call(final Event event) {
-                        try {
-                            final Map<String, Object> eventData = event.getEventData();
-                            if (OptimizeUtils.isNullOrEmpty(eventData)) {
-                                failWithError(callback, AdobeError.UNEXPECTED_ERROR);
-                                return;
-                            }
-
-                            if (eventData.containsKey(
-                                    OptimizeConstants.EventDataKeys.RESPONSE_ERROR)) {
-                                final int errorCode =
-                                        DataReader.getInt(
-                                                eventData,
-                                                OptimizeConstants.EventDataKeys.RESPONSE_ERROR);
-                                failWithError(
-                                        callback, OptimizeUtils.convertToAdobeError(errorCode));
-                                return;
-                            }
-
-                            final List<Map<String, Object>> propositionsList;
-                            propositionsList =
-                                    DataReader.getTypedListOfMap(
-                                            Object.class,
-                                            eventData,
-                                            OptimizeConstants.EventDataKeys.PROPOSITIONS);
-                            final Map<DecisionScope, OptimizeProposition> propositionsMap =
-                                    new HashMap<>();
-                            if (propositionsList != null) {
-                                for (final Map<String, Object> propositionData : propositionsList) {
-                                    final OptimizeProposition optimizeProposition =
-                                            OptimizeProposition.fromEventData(propositionData);
-                                    if (optimizeProposition != null
-                                            && !OptimizeUtils.isNullOrEmpty(
-                                                    optimizeProposition.getScope())) {
-                                        final DecisionScope scope =
-                                                new DecisionScope(optimizeProposition.getScope());
-                                        propositionsMap.put(scope, optimizeProposition);
-                                    }
-                                }
-                            }
-                            callback.call(propositionsMap);
-                        } catch (DataReaderException e) {
-                            failWithError(callback, AdobeError.UNEXPECTED_ERROR);
-                        }
-                    }
-                });
+        OptimizeImpl.INSTANCE.getPropositionsInternal(decisionScopes, timeoutSeconds, callback);
     }
 
     /**
@@ -424,94 +156,11 @@ public class Optimize {
      */
     public static void onPropositionsUpdate(
             @NonNull final AdobeCallback<Map<DecisionScope, OptimizeProposition>> callback) {
-        MobileCore.registerEventListener(
-                OptimizeConstants.EventType.OPTIMIZE,
-                OptimizeConstants.EventSource.NOTIFICATION,
-                new AdobeCallbackWithError<Event>() {
-                    @Override
-                    public void fail(final AdobeError error) {}
-
-                    @Override
-                    public void call(final Event event) {
-                        final Map<String, Object> eventData = event.getEventData();
-                        if (OptimizeUtils.isNullOrEmpty(eventData)) {
-                            return;
-                        }
-
-                        final List<Map<String, Object>> propositionsList;
-                        try {
-                            propositionsList =
-                                    DataReader.getTypedListOfMap(
-                                            Object.class,
-                                            eventData,
-                                            OptimizeConstants.EventDataKeys.PROPOSITIONS);
-
-                            final Map<DecisionScope, OptimizeProposition> propositionsMap =
-                                    new HashMap<>();
-                            if (propositionsList != null) {
-                                for (final Map<String, Object> propositionData : propositionsList) {
-                                    final OptimizeProposition optimizeProposition =
-                                            OptimizeProposition.fromEventData(propositionData);
-                                    if (optimizeProposition != null
-                                            && !OptimizeUtils.isNullOrEmpty(
-                                                    optimizeProposition.getScope())) {
-                                        final DecisionScope scope =
-                                                new DecisionScope(optimizeProposition.getScope());
-                                        propositionsMap.put(scope, optimizeProposition);
-                                    }
-                                }
-                            }
-
-                            if (!propositionsMap.isEmpty()) {
-                                callback.call(propositionsMap);
-                            }
-                        } catch (DataReaderException ignored) {
-                        }
-                    }
-                });
+        OptimizeImpl.INSTANCE.onPropositionsUpdate(callback);
     }
 
     /** Clears the client-side in-memory propositions cache. */
     public static void clearCachedPropositions() {
-        final Event event =
-                new Event.Builder(
-                                OptimizeConstants.EventNames.CLEAR_PROPOSITIONS_REQUEST,
-                                OptimizeConstants.EventType.OPTIMIZE,
-                                OptimizeConstants.EventSource.REQUEST_RESET)
-                        .build();
-        MobileCore.dispatchEvent(event);
-    }
-
-    /**
-     * Invokes fail method with the provided {@code error}, if the callback is an instance of {@code
-     * AdobeCallbackWithError}.
-     *
-     * @param callback can be an instance of {@link AdobeCallback} or {@link
-     *     AdobeCallbackWithError}.
-     * @param error {@link AdobeError} indicating the error name and code.
-     */
-    private static void failWithError(final AdobeCallback<?> callback, final AdobeError error) {
-
-        final AdobeCallbackWithError<?> callbackWithError =
-                callback instanceof AdobeCallbackWithError
-                        ? (AdobeCallbackWithError<?>) callback
-                        : null;
-
-        if (callbackWithError != null) {
-            callbackWithError.fail(error);
-        }
-    }
-
-    protected static void failWithOptimizeError(
-            final AdobeCallback<?> callback, final AEPOptimizeError error) {
-
-        final AdobeCallbackWithOptimizeError<?> callbackWithError =
-                callback instanceof AdobeCallbackWithOptimizeError
-                        ? (AdobeCallbackWithOptimizeError<?>) callback
-                        : null;
-
-        if (callbackWithError != null) {
-            callbackWithError.fail(error);
-        }
+        OptimizeImpl.INSTANCE.clearCachedPropositions();
     }
 }
