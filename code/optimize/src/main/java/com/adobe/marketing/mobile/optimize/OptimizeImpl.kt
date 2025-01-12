@@ -83,7 +83,7 @@ object OptimizeImpl {
                 SELF_TAG,
                 "Cannot get propositions, provided list of decision scopes is null or empty."
             )
-            failWithError(callback, AdobeError.UNEXPECTED_ERROR)
+            OptimizeUtils.failWithError(callback, AdobeError.UNEXPECTED_ERROR)
             return
         }
 
@@ -95,7 +95,7 @@ object OptimizeImpl {
                 SELF_TAG,
                 "Cannot get propositions, provided list of decision scopes has no valid scope."
             )
-            failWithError(callback, AdobeError.UNEXPECTED_ERROR)
+            OptimizeUtils.failWithError(callback, AdobeError.UNEXPECTED_ERROR)
             return
         }
 
@@ -122,13 +122,13 @@ object OptimizeImpl {
             timeoutMillis,
             object : AdobeCallbackWithError<Event> {
                 override fun fail(adobeError: AdobeError) {
-                    failWithError(callback, adobeError)
+                    OptimizeUtils.failWithError(callback, adobeError)
                 }
 
                 override fun call(event: Event) {
                     try {
                         val eventData = event.eventData ?: run {
-                            failWithError(callback, AdobeError.UNEXPECTED_ERROR)
+                            OptimizeUtils.failWithError(callback, AdobeError.UNEXPECTED_ERROR)
                             return
                         }
 
@@ -137,7 +137,7 @@ object OptimizeImpl {
                                 eventData,
                                 OptimizeConstants.EventDataKeys.RESPONSE_ERROR
                             )
-                            failWithError(callback, OptimizeUtils.convertToAdobeError(errorCode))
+                            OptimizeUtils.failWithError(callback, OptimizeUtils.convertToAdobeError(errorCode))
                             return
                         }
 
@@ -159,7 +159,7 @@ object OptimizeImpl {
 
                         callback.call(propositionsMap)
                     } catch (e: DataReaderException) {
-                        failWithError(callback, AdobeError.UNEXPECTED_ERROR)
+                        OptimizeUtils.failWithError(callback, AdobeError.UNEXPECTED_ERROR)
                     }
                 }
             }
@@ -182,7 +182,7 @@ object OptimizeImpl {
             )
 
             val aepOptimizeError = AEPOptimizeError.getUnexpectedError()
-            failWithOptimizeError(callback, aepOptimizeError)
+            OptimizeUtils.failWithOptimizeError(callback, aepOptimizeError)
             return
         }
 
@@ -228,20 +228,20 @@ object OptimizeImpl {
                         AdobeError.CALLBACK_TIMEOUT -> AEPOptimizeError.getTimeoutError()
                         else -> AEPOptimizeError.getUnexpectedError()
                     }
-                    failWithOptimizeError(callback, aepOptimizeError)
+                    OptimizeUtils.failWithOptimizeError(callback, aepOptimizeError)
                 }
 
                 override fun call(event: Event) {
                     try {
                         val eventData = event.eventData ?: run {
-                            failWithOptimizeError(callback, AEPOptimizeError.getUnexpectedError())
+                            OptimizeUtils.failWithOptimizeError(callback, AEPOptimizeError.getUnexpectedError())
                             return
                         }
 
                         if (eventData.containsKey(OptimizeConstants.EventDataKeys.RESPONSE_ERROR)) {
                             val error = eventData[OptimizeConstants.EventDataKeys.RESPONSE_ERROR]
                             if (error is Map<*, *>) {
-                                failWithOptimizeError(
+                                OptimizeUtils.failWithOptimizeError(
                                     callback,
                                     AEPOptimizeError.toAEPOptimizeError(error as Map<String, Any>)
                                 )
@@ -268,33 +268,10 @@ object OptimizeImpl {
 
                         callback?.call(propositionsMap)
                     } catch (e: DataReaderException) {
-                        failWithOptimizeError(callback, AEPOptimizeError.getUnexpectedError())
+                        OptimizeUtils.failWithOptimizeError(callback, AEPOptimizeError.getUnexpectedError())
                     }
                 }
             }
         )
-    }
-
-    fun failWithError(
-        callback: AdobeCallback<Map<DecisionScope, OptimizeProposition>>,
-        error: AdobeError
-    ) {
-        val callbackWithError =
-            if (callback is AdobeCallbackWithError<*>)
-                callback
-            else
-                null
-
-        callbackWithError?.fail(error)
-    }
-
-    fun failWithOptimizeError(
-        callback: AdobeCallback<Map<DecisionScope, OptimizeProposition>>?,
-        error: AEPOptimizeError
-    ) {
-        val callbackWithError =
-            if (callback is AdobeCallbackWithOptimizeError<*>) callback else null
-
-        callbackWithError?.fail(error)
     }
 }
