@@ -14,6 +14,7 @@ package com.adobe.marketing.optimizeapp.viewmodels
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.adobe.marketing.mobile.AdobeCallbackWithError
 import com.adobe.marketing.mobile.AdobeError
 import com.adobe.marketing.mobile.edge.identity.AuthenticatedState
@@ -27,6 +28,9 @@ import com.adobe.marketing.mobile.optimize.Optimize
 import com.adobe.marketing.mobile.optimize.OptimizeProposition
 import com.adobe.marketing.optimizeapp.impl.LogManager
 import com.adobe.marketing.optimizeapp.models.OptimizePair
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
@@ -149,11 +153,14 @@ class MainViewModel : ViewModel() {
 
                 override fun fail(error: AEPOptimizeError?) {
                     showDialog("Error in Update Propositions:: ${error?.adobeError?.errorName ?: "Undefined"}.")
-                    logBoxManager.addLog("Update Propositions | Failed | ${error?.adobeError?.errorName}")Log.i(
-                        "Optimize Test App",
-                        "Error in updating Propositions:: ${error?.title ?: "Undefined"}."
+                    logBoxManager.addLog("Update Propositions | Failed | ${error?.adobeError?.errorName}")Log.d(
+                        "Sagar",
+                        "Proposition UPDATE Callback Error Triggered : ${error?.adobeError?.errorName}"
                     )
-                }
+                    toastMessage.tryEmit("UPDATE FAILED - ${error?.adobeError?.errorName}")
+                    Log.d("Sagar", "ViewModel Callback Failure")
+                    }
+
             }
         optimizePropositionStateMap.clear()
         logBoxManager.addLog("Update Propositions Called | ${decisionScopeList.size} scopes \n" +

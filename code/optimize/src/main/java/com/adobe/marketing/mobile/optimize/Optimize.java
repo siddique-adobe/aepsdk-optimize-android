@@ -196,6 +196,7 @@ public class Optimize {
                 new AdobeCallbackWithError<Event>() {
                     @Override
                     public void fail(final AdobeError adobeError) {
+                        android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | Public Callback error");
                         AEPOptimizeError aepOptimizeError;
                         if (adobeError == AdobeError.CALLBACK_TIMEOUT) {
                             aepOptimizeError = AEPOptimizeError.Companion.getTimeoutError();
@@ -207,6 +208,7 @@ public class Optimize {
 
                     @Override
                     public void call(final Event event) {
+                        android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | Public Callback Success");
                         try {
                             final Map<String, Object> eventData = event.getEventData();
                             if (OptimizeUtils.isNullOrEmpty(eventData)) {
@@ -230,8 +232,7 @@ public class Optimize {
                                 }
                             }
 
-                            if (!eventData.containsKey(
-                                    OptimizeConstants.EventDataKeys.PROPOSITIONS)) {
+                            if (!eventData.containsKey(OptimizeConstants.EventDataKeys.PROPOSITIONS)) {
                                 return;
                             }
 
@@ -248,8 +249,7 @@ public class Optimize {
                                     final OptimizeProposition optimizeProposition =
                                             OptimizeProposition.fromEventData(propositionData);
                                     if (optimizeProposition != null
-                                            && !OptimizeUtils.isNullOrEmpty(
-                                                    optimizeProposition.getScope())) {
+                                            && !OptimizeUtils.isNullOrEmpty(optimizeProposition.getScope())) {
                                         final DecisionScope scope =
                                                 new DecisionScope(optimizeProposition.getScope());
                                         propositionsMap.put(scope, optimizeProposition);

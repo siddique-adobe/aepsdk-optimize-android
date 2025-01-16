@@ -60,12 +60,11 @@ class OptimizeExtension extends Extension {
                     new SerialWorkDispatcher.WorkHandler<Event>() {
                         @Override
                         public boolean doWork(final Event event) {
+                            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | doWork: name - " + event.getName() + " | type - " + event.getType());
                             if (OptimizeUtils.isGetEvent(event)) {
                                 handleGetPropositions(event);
-                            } else if (event.getType()
-                                    .equalsIgnoreCase(OptimizeConstants.EventType.EDGE)) {
-                                return !updateRequestEventIdsInProgress.containsKey(
-                                        event.getUniqueIdentifier());
+                            } else if (event.getType().equalsIgnoreCase(OptimizeConstants.EventType.EDGE)) {
+                                return !updateRequestEventIdsInProgress.containsKey(event.getUniqueIdentifier());
                             }
                             return true;
                         }
@@ -179,6 +178,7 @@ class OptimizeExtension extends Extension {
                         OptimizeConstants.EventSource.DEBUG,
                         this::handleDebugEvent);
 
+        android.util.Log.d("Sagar", "Event Dispatcher Start");
         eventsDispatcher.start();
     }
 
@@ -254,9 +254,11 @@ class OptimizeExtension extends Extension {
 
         switch (requestType) {
             case OptimizeConstants.EventDataValues.REQUEST_TYPE_UPDATE:
+                android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | UPDATE : handleOptimizeRequestContent: name - " + event.getName() + " | type - " + event.getType());
                 handleUpdatePropositions(event);
                 break;
             case OptimizeConstants.EventDataValues.REQUEST_TYPE_GET:
+                android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | GET : handleOptimizeRequestContent: name - " + event.getName() + " | type - " + event.getType());
                 try {
                     // Fetch decision scopes from the event
                     List<Map<String, Object>> decisionScopesData =
@@ -318,6 +320,7 @@ class OptimizeExtension extends Extension {
                                 SELF_TAG,
                                 "handleOptimizeRequestContent - Scopes are not fully cached or are"
                                         + " in progress, adding event to dispatcher.");
+                        android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | adding Event to serial dispatcher: name - " + event.getName() + " | type - " + event.getType());
                         eventsDispatcher.offer(event);
                     }
                     break;
@@ -331,6 +334,7 @@ class OptimizeExtension extends Extension {
                 }
                 break;
             case OptimizeConstants.EventDataValues.REQUEST_TYPE_TRACK:
+                android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | TRACK : handleOptimizeRequestContent: name - " + event.getName() + " | type - " + event.getType());
                 handleTrackPropositions(event);
                 break;
             default:
@@ -355,6 +359,7 @@ class OptimizeExtension extends Extension {
      * @param event incoming {@link Event} object to be processed.
      */
     void handleUpdatePropositions(@NonNull final Event event) {
+        android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | handleUpdatePropositions: name - " + event.getName() + " | type - " + event.getType());
         final Map<String, Object> eventData = event.getEventData();
 
         final Map<String, Object> configData = retrieveConfigurationSharedState(event);
@@ -456,12 +461,14 @@ class OptimizeExtension extends Extension {
             // for the Edge request.
             // Storing the request event unique identifier to compare and process only the
             // anticipated response in the extension.
+            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | updateRequestEventIdsInProgress PUT Valid Scopes: name - " + event.getName() + " | type - " + event.getType());
             updateRequestEventIdsInProgress.put(edgeEvent.getUniqueIdentifier(), validScopes);
 
+            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | Addign Event to serial Dispatcher: name - " + event.getName() + " | type - " + event.getType());
             // add the Edge event to update propositions in the events queue.
             eventsDispatcher.offer(edgeEvent);
-            long timeoutMillis =
-                    DataReader.getLong(eventData, OptimizeConstants.EventDataKeys.TIMEOUT);
+
+            long timeoutMillis = DataReader.getLong(eventData, OptimizeConstants.EventDataKeys.TIMEOUT);
             MobileCore.dispatchEventWithResponseCallback(
                     edgeEvent,
                     timeoutMillis,
@@ -471,7 +478,10 @@ class OptimizeExtension extends Extension {
                             // response event failed or timed out, remove this event's unique
                             // identifier from the requested event IDs dictionary and kick-off
                             // queue.
+                            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | Fail callback for edge event");
+                            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | updateRequestEventIdsInProgress REMOVE edgeEvent: name - " + event.getName() + " | type - " + event.getType());
                             updateRequestEventIdsInProgress.remove(edgeEvent.getUniqueIdentifier());
+                            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | propositionsInProgress CLEAR API failure: name - " + event.getName() + " | type - " + event.getType());
                             propositionsInProgress.clear();
 
                             AEPOptimizeError aepOptimizeError;
@@ -484,11 +494,13 @@ class OptimizeExtension extends Extension {
                             getApi().dispatch(
                                             createResponseEventWithError(event, aepOptimizeError));
 
+                            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | serial Dispatcher resume(): name - " + event.getName() + " | type - " + event.getType());
                             eventsDispatcher.resume();
                         }
 
                         @Override
                         public void call(final Event callbackEvent) {
+                            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | Success callback for edge event");
                             final String requestEventId =
                                     OptimizeUtils.getRequestEventId(callbackEvent);
                             if (OptimizeUtils.isNullOrEmpty(requestEventId)) {
@@ -507,14 +519,12 @@ class OptimizeExtension extends Extension {
 
                             final List<Map<String, Object>> propositionsList = new ArrayList<>();
 
-                            for (Map.Entry<DecisionScope, OptimizeProposition> entry :
-                                    propositionsInProgress.entrySet()) {
+                            for (Map.Entry<DecisionScope, OptimizeProposition> entry : propositionsInProgress.entrySet()) {
                                 OptimizeProposition optimizeProposition = entry.getValue();
                                 propositionsList.add(optimizeProposition.toEventData());
                             }
 
-                            responseEventData.put(
-                                    OptimizeConstants.EventDataKeys.PROPOSITIONS, propositionsList);
+                            responseEventData.put(OptimizeConstants.EventDataKeys.PROPOSITIONS, propositionsList);
 
                             final Event responseEvent =
                                     new Event.Builder(
@@ -568,6 +578,7 @@ class OptimizeExtension extends Extension {
      * @param event incoming {@link Event} object to be processed.
      */
     void handleUpdatePropositionsCompleted(@NonNull final Event event) {
+        android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | handleUpdatePropositionsCompleted: name - " + event.getName() + " | type - " + event.getType());
         try {
             final String requestCompletedForEventId =
                     DataReader.getString(
@@ -595,9 +606,11 @@ class OptimizeExtension extends Extension {
             }
 
             // Update propositions in cache
+            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | updateCachedPropositions: name - " + event.getName() + " | type - " + event.getType());
             updateCachedPropositions(requestedScopes);
 
             // remove completed event's ID from the request event IDs dictionary.
+            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | updateRequestEventIdsInProgress REMOVE " + requestCompletedForEventId + ": name - " + event.getName() + " | type - " + event.getType());
             updateRequestEventIdsInProgress.remove(requestCompletedForEventId);
         } catch (final DataReaderException e) {
             Log.warning(
@@ -607,9 +620,11 @@ class OptimizeExtension extends Extension {
                             + " complete event due to an exception (%s)!",
                     e.getLocalizedMessage());
         } finally {
+            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | propositionsInProgress CLEAR response complete: name - " + event.getName() + " | type - " + event.getType());
             propositionsInProgress.clear();
 
             // Resume events dispatcher processing after update propositions request is completed.
+            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | Serial Dispatcher resume(): name - " + event.getName() + " | type - " + event.getType());
             eventsDispatcher.resume();
         }
     }
@@ -623,7 +638,9 @@ class OptimizeExtension extends Extension {
      * @param requestedScopes a {@code List<DecisionScope>} for which propositions are requested.
      */
     private void updateCachedPropositions(@NonNull final List<DecisionScope> requestedScopes) {
+        android.util.Log.d("Sagar", "handleOptimizeRequestContent: name");
         // update cache with accumulated propositions
+        android.util.Log.d("Sagar", "cachedPropositions PUTALL propositionsInProgress: name");
         cachedPropositions.putAll(propositionsInProgress);
 
         // remove cached propositions for requested scopes for which no propositions are returned.
@@ -631,6 +648,7 @@ class OptimizeExtension extends Extension {
         final List<DecisionScope> scopesToRemove = new ArrayList<>(requestedScopes);
         scopesToRemove.removeAll(returnedScopes);
 
+        android.util.Log.d("Sagar", "cachedPropositions REMOVE requested but not returned");
         for (final DecisionScope scope : scopesToRemove) {
             cachedPropositions.remove(scope);
         }
@@ -646,6 +664,7 @@ class OptimizeExtension extends Extension {
      * @param event incoming {@link Event} object to be processed.
      */
     void handleEdgeResponse(@NonNull final Event event) {
+        android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | handleEdgeResponse: name - " + event.getName() + " | type - " + event.getType());
         try {
             final Map<String, Object> eventData = event.getEventData();
             final String requestEventId = OptimizeUtils.getRequestEventId(event);
@@ -659,6 +678,7 @@ class OptimizeExtension extends Extension {
                         "handleEdgeResponse - Ignoring Edge event, either handle type is not"
                             + " personalization:decisions, or the response isn't intended for this"
                             + " extension.");
+                android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | propositionsInProgress CLEAR handling response done: name - " + event.getName() + " | type - " + event.getType());
                 propositionsInProgress.clear();
                 return;
             }
@@ -698,6 +718,7 @@ class OptimizeExtension extends Extension {
             }
 
             // accumulate propositions in in-progress propositions dictionary
+            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | propositionsInProgress PUTALL event propositions: name - " + event.getName() + " | type - " + event.getType());
             propositionsInProgress.putAll(propositionsMap);
 
             final List<Map<String, Object>> propositionsList = new ArrayList<>();
@@ -737,6 +758,7 @@ class OptimizeExtension extends Extension {
      * @param event incoming {@link Event} object to be processed.
      */
     void handleEdgeErrorResponse(@NonNull final Event event) {
+        android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | handleEdgeErrorResponse: name - " + event.getName() + " | type - " + event.getType());
         try {
             final Map<String, Object> eventData = event.getEventData();
             final String requestEventId = OptimizeUtils.getRequestEventId(event);
@@ -815,6 +837,7 @@ class OptimizeExtension extends Extension {
                 AEPOptimizeError aepOptimizeError =
                         new AEPOptimizeError(
                                 errorType, errorStatus, errorTitle, errorDetail, errorReport, null);
+                android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | updateRequestEventIdsErrors PUT: name - " + event.getName() + " | type - " + event.getType());
                 updateRequestEventIdsErrors.put(requestEventId, aepOptimizeError);
             }
         } catch (final Exception e) {
@@ -991,7 +1014,10 @@ class OptimizeExtension extends Extension {
      * @param event incoming {@link Event} object to be processed.
      */
     void handleClearPropositions(@NonNull final Event event) {
+        android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | handleClearPropositions: name - " + event.getName() + " | type - " + event.getType());
+        android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | cachedPropositions CLEAR: name - " + event.getName() + " | type - " + event.getType());
         cachedPropositions.clear();
+        android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | previewCachedPropositions: name - " + event.getName() + " | type - " + event.getType());
         previewCachedPropositions.clear();
     }
 
@@ -1004,6 +1030,7 @@ class OptimizeExtension extends Extension {
      * @param event the debug {@link Event} to be handled.
      */
     void handleDebugEvent(@NonNull final Event event) {
+        android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | handleDebugEvent: name - " + event.getName() + " | type - " + event.getType());
         try {
             if (OptimizeUtils.isNullOrEmpty(event.getEventData())) {
                 Log.debug(
@@ -1058,6 +1085,7 @@ class OptimizeExtension extends Extension {
                 return;
             }
 
+            android.util.Log.d("Sagar", event.getUniqueIdentifier() + " | previewCachedPropositions PUTALL event propositions: name - " + event.getName() + " | type - " + event.getType());
             previewCachedPropositions.putAll(propositionsMap);
 
             final List<Map<String, Object>> propositionsList = new ArrayList<>();
