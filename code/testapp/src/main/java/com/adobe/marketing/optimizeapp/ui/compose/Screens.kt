@@ -11,7 +11,6 @@
  */
 package com.adobe.marketing.optimizeapp.ui.compose
 
-import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
@@ -44,16 +43,6 @@ fun MainScreen(viewModel: MainViewModel) {
         BottomNavigationScreen.OffersScreen,
         BottomNavigationScreen.SettingsScreen
     )
-
-    val context = LocalContext.current
-    val toastMessage by viewModel.toastMessage.collectAsState("")
-
-    LaunchedEffect(toastMessage) {
-        if(toastMessage.isNotEmpty()){
-            Toast.makeText(context, toastMessage, Toast.LENGTH_SHORT).show()
-            viewModel.clearToast()
-        }
-    }
 
     Scaffold(
         bottomBar = {
