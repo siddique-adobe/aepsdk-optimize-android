@@ -62,8 +62,10 @@ class OptimizeExtension extends Extension {
                         public boolean doWork(final Event event) {
                             if (OptimizeUtils.isGetEvent(event)) {
                                 handleGetPropositions(event);
-                            } else if (event.getType().equalsIgnoreCase(OptimizeConstants.EventType.EDGE)) {
-                                return !updateRequestEventIdsInProgress.containsKey(event.getUniqueIdentifier());
+                            } else if (event.getType()
+                                    .equalsIgnoreCase(OptimizeConstants.EventType.EDGE)) {
+                                return !updateRequestEventIdsInProgress.containsKey(
+                                        event.getUniqueIdentifier());
                             }
                             return true;
                         }
@@ -459,7 +461,8 @@ class OptimizeExtension extends Extension {
             // add the Edge event to update propositions in the events queue.
             eventsDispatcher.offer(edgeEvent);
 
-            long timeoutMillis = DataReader.getLong(eventData, OptimizeConstants.EventDataKeys.TIMEOUT);
+            long timeoutMillis =
+                    DataReader.getLong(eventData, OptimizeConstants.EventDataKeys.TIMEOUT);
             MobileCore.dispatchEventWithResponseCallback(
                     edgeEvent,
                     timeoutMillis,
@@ -505,12 +508,14 @@ class OptimizeExtension extends Extension {
 
                             final List<Map<String, Object>> propositionsList = new ArrayList<>();
 
-                            for (Map.Entry<DecisionScope, OptimizeProposition> entry : propositionsInProgress.entrySet()) {
+                            for (Map.Entry<DecisionScope, OptimizeProposition> entry :
+                                    propositionsInProgress.entrySet()) {
                                 OptimizeProposition optimizeProposition = entry.getValue();
                                 propositionsList.add(optimizeProposition.toEventData());
                             }
 
-                            responseEventData.put(OptimizeConstants.EventDataKeys.PROPOSITIONS, propositionsList);
+                            responseEventData.put(
+                                    OptimizeConstants.EventDataKeys.PROPOSITIONS, propositionsList);
 
                             final Event responseEvent =
                                     new Event.Builder(

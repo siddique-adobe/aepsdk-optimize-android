@@ -230,7 +230,8 @@ public class Optimize {
                                 }
                             }
 
-                            if (!eventData.containsKey(OptimizeConstants.EventDataKeys.PROPOSITIONS)) {
+                            if (!eventData.containsKey(
+                                    OptimizeConstants.EventDataKeys.PROPOSITIONS)) {
                                 return;
                             }
 
@@ -247,7 +248,8 @@ public class Optimize {
                                     final OptimizeProposition optimizeProposition =
                                             OptimizeProposition.fromEventData(propositionData);
                                     if (optimizeProposition != null
-                                            && !OptimizeUtils.isNullOrEmpty(optimizeProposition.getScope())) {
+                                            && !OptimizeUtils.isNullOrEmpty(
+                                                    optimizeProposition.getScope())) {
                                         final DecisionScope scope =
                                                 new DecisionScope(optimizeProposition.getScope());
                                         propositionsMap.put(scope, optimizeProposition);
