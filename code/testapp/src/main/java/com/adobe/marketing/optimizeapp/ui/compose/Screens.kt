@@ -9,7 +9,7 @@
  OF ANY KIND, either express or implied. See the License for the specific language
  governing permissions and limitations under the License.
  */
-package com.adobe.marketing.optimizeapp
+package com.adobe.marketing.optimizeapp.ui.compose
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -26,6 +26,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.adobe.marketing.optimizeapp.R
 import com.adobe.marketing.optimizeapp.viewmodels.MainViewModel
 
 @Composable

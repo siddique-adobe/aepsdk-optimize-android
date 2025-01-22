@@ -9,13 +9,14 @@
  OF ANY KIND, either express or implied. See the License for the specific language
  governing permissions and limitations under the License.
  */
-package com.adobe.marketing.optimizeapp
+package com.adobe.marketing.optimizeapp.ui.compose
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,6 +29,7 @@ import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.adobe.marketing.mobile.Assurance
+import com.adobe.marketing.optimizeapp.R
 import com.adobe.marketing.optimizeapp.models.OptimizePair
 import com.adobe.marketing.optimizeapp.viewmodels.MainViewModel
 
@@ -75,6 +77,8 @@ fun SettingsView(viewModel: MainViewModel) {
             SettingsLabel(text = "Target Parameters - Product", align = TextAlign.Center, textStyle = MaterialTheme.typography.subtitle2)
             SettingsTextField(value = viewModel.textTargetProductId, placeholder = "Enter Product Id") { viewModel.textTargetProductId = it }
             SettingsTextField(value = viewModel.textTargetProductCategoryId, placeholder = "Enter Product Category id") { viewModel.textTargetProductCategoryId = it }
+            SettingsLabel(text = "Preferences", align = TextAlign.Start, textStyle = MaterialTheme.typography.subtitle1)
+            SettingsToggle(viewModel.logManager.showLogs, "Show Logs on Offers Screen")
             SettingsLabel(text = "About", align = TextAlign.Start, textStyle = MaterialTheme.typography.subtitle1)
             VersionLabel(viewModel.getOptimizeExtensionVersion())
         }
@@ -203,6 +207,32 @@ private fun VersionLabel(version: String){
         Text(
             text = version, modifier = Modifier
                 .padding(10.dp)
+                .align(Alignment.CenterEnd)
+        )
+    }
+}
+
+@Composable
+private fun SettingsToggle(state: MutableState<Boolean>, label: String){
+    Box(
+        modifier = Modifier
+            .absolutePadding(left = 20.dp, right = 20.dp, top = 10.dp, bottom = 10.dp)
+            .background(color = Color.White, shape = RoundedCornerShape(15.dp))
+            .fillMaxWidth()
+            .clickable {
+                state.value = !state.value
+            }
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier
+                .padding(10.dp)
+                .align(Alignment.CenterStart)
+        )
+        Switch(
+            checked = state.value,
+            onCheckedChange = { state.value = it },
+            modifier = Modifier
                 .align(Alignment.CenterEnd)
         )
     }

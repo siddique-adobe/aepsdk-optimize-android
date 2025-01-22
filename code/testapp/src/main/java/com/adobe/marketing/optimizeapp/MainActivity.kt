@@ -16,6 +16,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import com.adobe.marketing.mobile.MobileCore
+import com.adobe.marketing.optimizeapp.ui.compose.MainScreen
 import com.adobe.marketing.optimizeapp.ui.theme.OptimizeTheme
 import com.adobe.marketing.optimizeapp.viewmodels.MainViewModel
 

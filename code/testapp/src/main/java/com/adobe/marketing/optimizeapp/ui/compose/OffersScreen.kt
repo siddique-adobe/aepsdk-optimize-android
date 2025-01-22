@@ -9,7 +9,7 @@
  OF ANY KIND, either express or implied. See the License for the specific language
  governing permissions and limitations under the License.
  */
-package com.adobe.marketing.optimizeapp
+package com.adobe.marketing.optimizeapp.ui.compose
 
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,6 +38,7 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.adobe.marketing.mobile.optimize.Offer
 import com.adobe.marketing.mobile.optimize.OfferType
+import com.adobe.marketing.optimizeapp.R
 import com.adobe.marketing.optimizeapp.viewmodels.MainViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -52,87 +54,18 @@ private val displayHandler: (Offer) -> Unit = { offer ->
 
 @Composable
 fun OffersView(viewModel: MainViewModel) {
-    val listState = rememberLazyListState()
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+
     Column(
         modifier = Modifier
             .fillMaxHeight()
             .fillMaxWidth()
     ) {
         if (viewModel.optimizePropositionStateMap.isEmpty()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(state = rememberScrollState())
-            ) {
-
-                OffersSectionText(sectionName = "Text Offers")
-                TextOffers()
-                OffersSectionText(sectionName = "Image Offers")
-                ImageOffers()
-                OffersSectionText(sectionName = "HTML Offers")
-                HTMLOffers()
-                OffersSectionText(sectionName = "JSON Offers")
-                JSONOffers()
-                OffersSectionText(sectionName = "Target Offers")
-                TargetOffersView()
-            }
+            PlaceHolderOffersList(modifier = Modifier.weight(1f))
         } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                state = listState
-            ) {
-                items(
-                    items = viewModel.optimizePropositionStateMap.keys.toList().sorted(),
-                    key = { item -> item },
-                    itemContent = { item ->
-                        when (item) {
-                            viewModel.textOdeText -> {
-                                OffersSectionText(sectionName = "Text Offers")
-                                TextOffers(
-                                    offers = viewModel.optimizePropositionStateMap[viewModel.textOdeText]?.offers,
-                                    listState = listState
-                                )
-                            }
-
-                            viewModel.textOdeImage -> {
-                                OffersSectionText(sectionName = "Image Offers")
-                                ImageOffers(
-                                    offers = viewModel.optimizePropositionStateMap[viewModel.textOdeImage]?.offers,
-                                    listState = listState
-                                )
-                            }
-
-                            viewModel.textOdeHtml -> {
-                                OffersSectionText(sectionName = "HTML Offers")
-                                HTMLOffers(
-                                    offers = viewModel.optimizePropositionStateMap[viewModel.textOdeHtml]?.offers,
-                                    listState = listState
-                                )
-                            }
-
-                            viewModel.textOdeJson -> {
-                                OffersSectionText(sectionName = "JSON Offers")
-                                JSONOffers(
-                                    offers = viewModel.optimizePropositionStateMap[viewModel.textOdeJson]?.offers,
-                                    listState = listState
-                                )
-                            }
-
-                            viewModel.textTargetMbox -> {
-                                OffersSectionText(sectionName = "Target Offers")
-                                TargetOffersView(
-                                    offers = viewModel.optimizePropositionStateMap[viewModel.textTargetMbox]?.offers,
-                                    listState = listState
-                                )
-                            }
-                        }
-                    })
-            }
+            OffersList(modifier = Modifier.weight(1f), viewModel = viewModel)
         }
-
 
         Spacer(
             modifier = Modifier
@@ -141,54 +74,157 @@ fun OffersView(viewModel: MainViewModel) {
                 .background(color = Color.Gray)
         )
 
-
-        Row(
-            modifier = Modifier
-                .padding(10.dp)
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = {
-                    viewModel.updatePropositions()
-                }
-            ) {
-                Text(
-                    text = "Update Propositions",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.button
-                )
-            }
-
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = {
-                    viewModel.getPropositions()
-                }
-            ) {
-                Text(
-                    text = "Get Propositions",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.button
-                )
-            }
-
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = {
-                    viewModel.clearCachedPropositions()
-                }
-            ) {
-                Text(
-                    text = "Clear Propositions",
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.button
-                )
-            }
+        if(viewModel.logManager.showLogs.value) {
+            LogBox(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = screenHeight * 0.3f),
+                viewModel = viewModel
+            )
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(color = Color.Gray)
+            )
         }
+
+        ActionButtons(viewModel = viewModel)
+    }
+}
+
+@Composable
+fun ActionButtons(
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel,
+) {
+    Row(
+        modifier = modifier
+            .padding(10.dp)
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+
+        Button(
+            modifier = Modifier.weight(1f),
+            onClick = {
+                viewModel.updatePropositions()
+            }
+        ) {
+            Text(
+                text = "Update Propositions",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.button
+            )
+        }
+
+        Button(
+            modifier = Modifier.weight(1f),
+            onClick = {
+                viewModel.getPropositions()
+            }
+        ) {
+            Text(
+                text = "Get Propositions",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.button
+            )
+        }
+
+        Button(
+            modifier = Modifier.weight(1f),
+            onClick = {
+                viewModel.clearCachedPropositions()
+            }
+        ) {
+            Text(
+                text = "Clear Propositions",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.button
+            )
+        }
+    }
+}
+
+@Composable
+fun OffersList(
+    modifier: Modifier,
+    viewModel: MainViewModel,
+) {
+    val listState = rememberLazyListState()
+    LazyColumn(
+        modifier = modifier
+            .fillMaxWidth(),
+        state = listState
+    ) {
+        items(
+            items = viewModel.optimizePropositionStateMap.keys.toList().sorted(),
+            key = { item -> item },
+            itemContent = { item ->
+                when (item) {
+                    viewModel.textOdeText -> {
+                        OffersSectionText(sectionName = "Text Offers")
+                        TextOffers(
+                            offers = viewModel.optimizePropositionStateMap[viewModel.textOdeText]?.offers,
+                            listState = listState
+                        )
+                    }
+
+                    viewModel.textOdeImage -> {
+                        OffersSectionText(sectionName = "Image Offers")
+                        ImageOffers(
+                            offers = viewModel.optimizePropositionStateMap[viewModel.textOdeImage]?.offers,
+                            listState = listState
+                        )
+                    }
+
+                    viewModel.textOdeHtml -> {
+                        OffersSectionText(sectionName = "HTML Offers")
+                        HTMLOffers(
+                            offers = viewModel.optimizePropositionStateMap[viewModel.textOdeHtml]?.offers,
+                            listState = listState
+                        )
+                    }
+
+                    viewModel.textOdeJson -> {
+                        OffersSectionText(sectionName = "JSON Offers")
+                        JSONOffers(
+                            offers = viewModel.optimizePropositionStateMap[viewModel.textOdeJson]?.offers,
+                            listState = listState
+                        )
+                    }
+
+                    viewModel.textTargetMbox -> {
+                        OffersSectionText(sectionName = "Target Offers")
+                        TargetOffersView(
+                            offers = viewModel.optimizePropositionStateMap[viewModel.textTargetMbox]?.offers,
+                            listState = listState
+                        )
+                    }
+                }
+            })
+    }
+}
+
+@Composable
+fun PlaceHolderOffersList(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .verticalScroll(state = rememberScrollState())
+    ) {
+
+        OffersSectionText(sectionName = "Text Offers")
+        TextOffers()
+        OffersSectionText(sectionName = "Image Offers")
+        ImageOffers()
+        OffersSectionText(sectionName = "HTML Offers")
+        HTMLOffers()
+        OffersSectionText(sectionName = "JSON Offers")
+        JSONOffers()
+        OffersSectionText(sectionName = "Target Offers")
+        TargetOffersView()
     }
 }
 
@@ -399,7 +435,7 @@ fun HtmlOfferWebView(html: String, onclick: (() -> Unit)? = null) {
 
             setOnTouchListener { _, _ ->
                 onclick?.invoke()
-                true
+                this.performClick()
             }
         }
     }, update = {
