@@ -5,17 +5,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import com.adobe.marketing.optimizeapp.R
 import com.adobe.marketing.optimizeapp.models.LogEntry
@@ -50,52 +52,57 @@ fun LogBox(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                if(viewModel.logBoxManager.logs.isNotEmpty()) {
-                    Icon(
+                if (viewModel.logBoxManager.logs.isNotEmpty()) {
+                    Row(
                         modifier = Modifier
-                            .padding(4.dp)
-                            .size(14.dp)
-                            .clickable {
-                                viewModel.logBoxManager.showLogs.value = false
-                            },
-                        painter = painterResource(R.drawable.ic_clear_logs),
-                        tint = Color.White,
-                        contentDescription = if (expanded) "Collapse" else "Expand"
-                    )
-
-                    Text(
-                        text = "Clear Logs",
-                        fontSize = 14.sp,
-                        color = Color.White,
-                        modifier = Modifier.padding(vertical = 8.dp)
                             .clickable {
                                 viewModel.logBoxManager.clearLogs()
-                            }
-                    )
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .size(14.dp),
+                            painter = painterResource(R.drawable.ic_clear_logs),
+                            tint = Color.White,
+                            contentDescription = if (expanded) "Collapse" else "Expand"
+                        )
+
+                        Text(
+                            text = "Clear Logs",
+                            fontSize = 14.sp,
+                            color = Color.White,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
 
                     Spacer(modifier = Modifier.width(12.dp))
 
-                    Icon(
+                    val context = LocalContext.current
+                    Row(
                         modifier = Modifier
-                            .padding(4.dp)
-                            .size(16.dp)
                             .clickable {
-                                viewModel.logBoxManager.showLogs.value = false
+                                viewModel.logBoxManager.shareLogs(context)
                             },
-                        painter = painterResource(R.drawable.ic_copy),
-                        tint = Color.White,
-                        contentDescription = if (expanded) "Collapse" else "Expand"
-                    )
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .size(16.dp),
+                            painter = painterResource(R.drawable.ic_share),
+                            tint = Color.White,
+                            contentDescription = if (expanded) "Collapse" else "Expand"
+                        )
 
-                    Text(
-                        text = "Copy Logs",
-                        fontSize = 14.sp,
-                        color = Color.White,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                            .clickable {
-                                viewModel.logBoxManager.showLogs()
-                            }
-                    )
+                        Text(
+                            text = "Share",
+                            fontSize = 14.sp,
+                            color = Color.White,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                    }
 
                     Spacer(modifier = Modifier.width(12.dp))
                 }
@@ -105,7 +112,7 @@ fun LogBox(
                         .padding(4.dp)
                         .size(24.dp)
                         .clickable {
-                            viewModel.logBoxManager.showLogs.value = false
+                            viewModel.showLogs.value = false
                         },
                     painter = painterResource(R.drawable.ic_close),
                     tint = Color.White,
@@ -132,13 +139,18 @@ fun LogBox(
             } else if (logs.isEmpty()) {
                 LogView(LogEntry("", "No logs available"))
             } else {
-                LogView(logs.last())
+                LogView(logs.last(), 2)
             }
         }
 
         if (logs.isNotEmpty()) {
             Icon(
                 modifier = Modifier
+                    .background(
+                        color = Color(0x50FFFFFF),
+                        shape = CircleShape
+                    )
+                    .padding(4.dp)
                     .align(Alignment.BottomEnd)
                     .clickable {
                         expanded = !expanded
@@ -146,7 +158,7 @@ fun LogBox(
                 painter = if (expanded)
                     painterResource(R.drawable.ic_compress)
                 else
-                    painterResource(R.drawable.ic_detailed),
+                    painterResource(R.drawable.ic_expand),
                 tint = Color.White,
                 contentDescription = if (expanded) "Collapse" else "Expand"
             )
@@ -155,13 +167,13 @@ fun LogBox(
 }
 
 @Composable
-private fun LogView(log: LogEntry) {
+private fun LogView(log: LogEntry, maxLines: Int = Integer.MAX_VALUE) {
     Text(
         text = "${log.timestamp}: ${log.text}",
         color = Color.White,
         modifier = Modifier.padding(vertical = 2.dp),
-        maxLines = 2,
         overflow = TextOverflow.Ellipsis,
-        style = MaterialTheme.typography.body2
+        style = MaterialTheme.typography.body2,
+        maxLines = maxLines
     )
 }

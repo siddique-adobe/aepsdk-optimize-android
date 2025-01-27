@@ -53,18 +53,33 @@ class MainViewModel : ViewModel() {
     var timeoutConfig = mutableDoubleStateOf(5.0) //Seconds
 
     //Visible logs for UI
+    val showLogs = mutableStateOf(true)
     val logBoxManager = LogManager()
+
+    //UI Alert Dialog
+    private val _dialogContent = mutableStateOf("")
+    val dialogContent: State<String> = _dialogContent
+
+    fun showDialog(content: String) {
+        _dialogContent.value = content
+    }
+
+    fun hideDialog() {
+        _dialogContent.value = ""
+    }
 
     private val optimizePropositionUpdateCallback =
         object : AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>> {
             override fun call(propositions: Map<DecisionScope, OptimizeProposition>?) {
-                logBoxManager.addLog("onUpdateProposition | Success")
+                logBoxManager.addLog("onUpdateProposition | Success | ${propositions?.size} propositions: \n" +
+                        "Propositions updated: ${propositions?.keys?.joinToString { it.name }}")
                 propositions?.forEach {
                     optimizePropositionStateMap[it.key.name] = it.value
                 }
             }
 
             override fun fail(error: AdobeError?) {
+                showDialog("Error in updating OptimizeProposition:: ${error?.errorName ?: "Undefined"}.")
                 logBoxManager.addLog("onUpdateProposition | Failed | ${error?.errorName}")
                 print("Error in updating OptimizeProposition:: ${error?.errorName ?: "Undefined"}.")
             }
@@ -90,19 +105,22 @@ class MainViewModel : ViewModel() {
         val decisionScopeList = getDecisionScopes()
         val callback = object : AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>> {
             override fun call(propositions: Map<DecisionScope, OptimizeProposition>?) {
-                logBoxManager.addLog("Getting Propositions | Success")
+                logBoxManager.addLog("Getting Propositions | Success | ${propositions?.size} propositions: \n" +
+                        "Propositions received: ${propositions?.keys?.joinToString { it.name }}")
                 propositions?.forEach {
                     optimizePropositionStateMap[it.key.name] = it.value
                 }
             }
 
             override fun fail(error: AdobeError?) {
+                showDialog("Error in Get Propositions:: ${error?.errorName}")
                 logBoxManager.addLog("Getting Propositions | Failed | ${error?.errorName}")
                 print("Error in getting Propositions.")
             }
         }
 
-        logBoxManager.addLog("Getting Propositions Called")
+        logBoxManager.addLog("Getting Propositions Called | ${decisionScopeList.size} scopes \n" +
+                "Decision Scopes: ${decisionScopeList.joinToString { it.name }}")
         Optimize.getPropositions(
             decisionScopeList,
             timeoutConfig.doubleValue,
@@ -116,16 +134,19 @@ class MainViewModel : ViewModel() {
         val decisionScopeList = getDecisionScopes()
         val targetParams = getTargetParams()
         val data = getDataMap(targetParams)
+        val xdmData = mapOf(Pair("xdmKey", "1234"))
 
         val callback =
             object : AdobeCallbackWithOptimizeError<Map<DecisionScope, OptimizeProposition>> {
                 override fun call(propositions: Map<DecisionScope, OptimizeProposition>?) {
-                    logBoxManager.addLog("Update Propositions | Success")
+                    logBoxManager.addLog("Update Propositions | Success | ${propositions?.size} propositions: \n" +
+                            "Propositions updated: ${propositions?.keys?.joinToString { it.name }}")
                     Log.i("Optimize Test App", "Propositions updated successfully.")
                 }
 
                 override fun fail(error: AEPOptimizeError?) {
-                    logBoxManager.addLog("Update Propositions | Failed | ${error?.title}")
+                    showDialog("Error in Update Propositions:: ${error?.adobeError?.errorName ?: "Undefined"}.")
+                    logBoxManager.addLog("Update Propositions | Failed | ${error?.adobeError?.errorName}")
                     Log.i(
                         "Optimize Test App",
                         "Error in updating Propositions:: ${error?.title ?: "Undefined"}."
@@ -134,10 +155,13 @@ class MainViewModel : ViewModel() {
             }
 
         optimizePropositionStateMap.clear()
-        logBoxManager.addLog("Update Propositions Called")
+        logBoxManager.addLog("Update Propositions Called | ${decisionScopeList.size} scopes \n" +
+                "Decision Scopes: ${decisionScopeList.joinToString { it.name }}\n" +
+                "Data: $data\n" +
+                "XDM Data: $xdmData")
         Optimize.updatePropositions(
             decisionScopeList,
-            mapOf(Pair("xdmKey", "1234")),
+            xdmData,
             data,
             timeoutConfig.doubleValue,
             callback
@@ -148,7 +172,8 @@ class MainViewModel : ViewModel() {
      * Calls the Optimize SDK API to clear the cached Propositions [Optimize.clearCachedPropositions]
      */
     fun clearCachedPropositions() {
-        logBoxManager.addLog("Clearing Propositions")
+        logBoxManager.addLog("Clearing Propositions :\n" +
+                "Propositions before clearing: ${optimizePropositionStateMap.keys}")
         optimizePropositionStateMap.clear()
         Optimize.clearCachedPropositions()
     }

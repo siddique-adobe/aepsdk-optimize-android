@@ -4,14 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.FileProvider
 import com.adobe.marketing.optimizeapp.models.LogEntry
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class LogManager {
-
-    val showLogs = mutableStateOf(true)
 
     private val _logs = mutableStateListOf<LogEntry>()
     val logs: List<LogEntry> get() = _logs
@@ -19,7 +19,7 @@ class LogManager {
     fun addLog(log: String) {
         _logs.add(
             LogEntry(
-                System.currentTimeMillis().toString(),
+                getTimeStamp(),
                 log
             )
         )
@@ -33,12 +33,13 @@ class LogManager {
         try {
 
             // Create a file in the cache directory
-            val file = File(context.cacheDir, "sharedLogs.txt")
+            val fileName = "optimize - ${getTimeStamp()}.txt"
+            val file = File(context.cacheDir, fileName)
             file.writeText("")
 
             // Write each log entry to the file
             _logs.forEach { logEntry ->
-                file.appendText("${logEntry.timestamp}: ${logEntry.message}\n")
+                file.appendText("${logEntry.timestamp}: ${logEntry.text}\n")
             }
 
             // Get a URI for the file using FileProvider
@@ -62,6 +63,11 @@ class LogManager {
         }
     }
 
+
+    private fun getTimeStamp(): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        return dateFormat.format(Date())
+    }
 
 
 }

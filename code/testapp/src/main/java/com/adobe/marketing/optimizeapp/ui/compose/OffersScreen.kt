@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
@@ -72,7 +73,7 @@ fun OffersView(viewModel: MainViewModel) {
                 OffersList(viewModel = viewModel)
             }
 
-            if(viewModel.logBoxManager.showLogs.value.not()) {
+            if(viewModel.showLogs.value.not()) {
                 IconButton(
                     modifier = Modifier
                         .padding(8.dp)
@@ -82,14 +83,23 @@ fun OffersView(viewModel: MainViewModel) {
                             shape = CircleShape
                         ),
                     onClick = {
-                        viewModel.logBoxManager.showLogs.value = true
+                        viewModel.showLogs.value = true
                     }
                 ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_logs),
-                        tint = Color.White,
-                        contentDescription = "Show Logs"
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_logs),
+                            tint = Color.White,
+                            contentDescription = "Show Logs"
+                        )
+                        Text(
+                            text = "Logs",
+                            fontSize = 12.sp,
+                            color = Color.White
+                        )
+                    }
                 }
             }
         }
@@ -101,7 +111,7 @@ fun OffersView(viewModel: MainViewModel) {
                 .background(color = Color.Gray)
         )
 
-        if(viewModel.logBoxManager.showLogs.value) {
+        if(viewModel.showLogs.value) {
             LogBox(
                 modifier = Modifier
                     .fillMaxWidth()
