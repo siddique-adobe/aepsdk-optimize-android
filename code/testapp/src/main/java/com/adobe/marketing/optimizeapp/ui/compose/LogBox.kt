@@ -1,6 +1,7 @@
 package com.adobe.marketing.optimizeapp.ui.compose
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -27,7 +28,7 @@ fun LogBox(
     viewModel: MainViewModel
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val logs = viewModel.logManager.logs
+    val logs = viewModel.logBoxManager.logs
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
@@ -37,12 +38,80 @@ fun LogBox(
             .padding(8.dp)
     ) {
         Column {
-            Text(
-                text = "Logs",
-                fontSize = 16.sp,
-                color = Color.White,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Logs",
+                    fontSize = 18.sp,
+                    color = Color.White,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                if(viewModel.logBoxManager.logs.isNotEmpty()) {
+                    Icon(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(14.dp)
+                            .clickable {
+                                viewModel.logBoxManager.showLogs.value = false
+                            },
+                        painter = painterResource(R.drawable.ic_clear_logs),
+                        tint = Color.White,
+                        contentDescription = if (expanded) "Collapse" else "Expand"
+                    )
+
+                    Text(
+                        text = "Clear Logs",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                            .clickable {
+                                viewModel.logBoxManager.clearLogs()
+                            }
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Icon(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(16.dp)
+                            .clickable {
+                                viewModel.logBoxManager.showLogs.value = false
+                            },
+                        painter = painterResource(R.drawable.ic_copy),
+                        tint = Color.White,
+                        contentDescription = if (expanded) "Collapse" else "Expand"
+                    )
+
+                    Text(
+                        text = "Copy Logs",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                            .clickable {
+                                viewModel.logBoxManager.showLogs()
+                            }
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+                }
+
+                Icon(
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .size(24.dp)
+                        .clickable {
+                            viewModel.logBoxManager.showLogs.value = false
+                        },
+                    painter = painterResource(R.drawable.ic_close),
+                    tint = Color.White,
+                    contentDescription = if (expanded) "Collapse" else "Expand"
+                )
+            }
             if (expanded && logs.isNotEmpty()) {
                 LazyColumn(
                     state = listState,
@@ -61,22 +130,23 @@ fun LogBox(
                     }
                 }
             } else if (logs.isEmpty()) {
-                LogView(LogEntry("No logs available", ""))
+                LogView(LogEntry("", "No logs available"))
             } else {
                 LogView(logs.last())
             }
         }
 
-        IconButton(
-            onClick = { expanded = !expanded },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-        ) {
+        if (logs.isNotEmpty()) {
             Icon(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .clickable {
+                        expanded = !expanded
+                    },
                 painter = if (expanded)
-                    painterResource(R.drawable.ic_arrow_down)
+                    painterResource(R.drawable.ic_compress)
                 else
-                    painterResource(R.drawable.ic_arrow_up),
+                    painterResource(R.drawable.ic_detailed),
                 tint = Color.White,
                 contentDescription = if (expanded) "Collapse" else "Expand"
             )

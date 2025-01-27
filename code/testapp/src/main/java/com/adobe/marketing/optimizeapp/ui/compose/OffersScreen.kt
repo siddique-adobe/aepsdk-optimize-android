@@ -19,7 +19,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -61,10 +64,34 @@ fun OffersView(viewModel: MainViewModel) {
             .fillMaxHeight()
             .fillMaxWidth()
     ) {
-        if (viewModel.optimizePropositionStateMap.isEmpty()) {
-            PlaceHolderOffersList(modifier = Modifier.weight(1f))
-        } else {
-            OffersList(modifier = Modifier.weight(1f), viewModel = viewModel)
+
+        Box(modifier = Modifier.weight(1f)) {
+            if (viewModel.optimizePropositionStateMap.isEmpty()) {
+                PlaceHolderOffersList()
+            } else {
+                OffersList(viewModel = viewModel)
+            }
+
+            if(viewModel.logBoxManager.showLogs.value.not()) {
+                IconButton(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .align(Alignment.BottomEnd)
+                        .background(
+                            color = Color(0xFF3949AB),
+                            shape = CircleShape
+                        ),
+                    onClick = {
+                        viewModel.logBoxManager.showLogs.value = true
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_logs),
+                        tint = Color.White,
+                        contentDescription = "Show Logs"
+                    )
+                }
+            }
         }
 
         Spacer(
@@ -74,7 +101,7 @@ fun OffersView(viewModel: MainViewModel) {
                 .background(color = Color.Gray)
         )
 
-        if(viewModel.logManager.showLogs.value) {
+        if(viewModel.logBoxManager.showLogs.value) {
             LogBox(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -149,7 +176,7 @@ fun ActionButtons(
 
 @Composable
 fun OffersList(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     viewModel: MainViewModel,
 ) {
     val listState = rememberLazyListState()

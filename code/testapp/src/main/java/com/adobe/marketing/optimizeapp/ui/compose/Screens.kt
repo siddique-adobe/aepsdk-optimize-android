@@ -40,14 +40,18 @@ fun MainScreen(viewModel: MainViewModel) {
         BottomNavigationScreen.SettingsScreen
     )
 
-    Scaffold(bottomBar = {
-        OffersBottomNavigation(navController = navController, items = bottomNavigationItems, onNavigationChange = {
-            appBarTitle = when(it){
-                BottomNavigationScreen.SettingsScreen -> "Settings"
-                BottomNavigationScreen.OffersScreen -> "Welcome to Optimize Demo"
-            }
-        })
-    },
+    Scaffold(
+        bottomBar = {
+            OffersBottomNavigation(
+                navController = navController,
+                items = bottomNavigationItems,
+                onNavigationChange = {
+                    appBarTitle = when (it) {
+                        BottomNavigationScreen.SettingsScreen -> "Settings"
+                        BottomNavigationScreen.OffersScreen -> "Welcome to Optimize Demo"
+                    }
+                })
+        },
         topBar = {
             TopAppBar {
                 Text(

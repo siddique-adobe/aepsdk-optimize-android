@@ -77,8 +77,6 @@ fun SettingsView(viewModel: MainViewModel) {
             SettingsLabel(text = "Target Parameters - Product", align = TextAlign.Center, textStyle = MaterialTheme.typography.subtitle2)
             SettingsTextField(value = viewModel.textTargetProductId, placeholder = "Enter Product Id") { viewModel.textTargetProductId = it }
             SettingsTextField(value = viewModel.textTargetProductCategoryId, placeholder = "Enter Product Category id") { viewModel.textTargetProductCategoryId = it }
-            SettingsLabel(text = "Preferences", align = TextAlign.Start, textStyle = MaterialTheme.typography.subtitle1)
-            SettingsToggle(viewModel.logManager.showLogs, "Show Logs on Offers Screen")
             SettingsLabel(text = "About", align = TextAlign.Start, textStyle = MaterialTheme.typography.subtitle1)
             VersionLabel(viewModel.getOptimizeExtensionVersion())
         }

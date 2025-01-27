@@ -50,19 +50,19 @@ class MainViewModel : ViewModel() {
     var optimizePropositionStateMap = mutableStateMapOf<String, OptimizeProposition>()
 
     //Visible logs for UI
-    val logManager = LogManager()
+    val logBoxManager = LogManager()
 
     private val optimizePropositionUpdateCallback =
         object : AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>> {
             override fun call(propositions: Map<DecisionScope, OptimizeProposition>?) {
-                logManager.addLog("onUpdateProposition | Success")
+                logBoxManager.addLog("onUpdateProposition | Success")
                 propositions?.forEach {
                     optimizePropositionStateMap[it.key.name] = it.value
                 }
             }
 
             override fun fail(error: AdobeError?) {
-                logManager.addLog("onUpdateProposition | Failed | ${error?.errorName}")
+                logBoxManager.addLog("onUpdateProposition | Failed | ${error?.errorName}")
                 print("Error in updating OptimizeProposition:: ${error?.errorName ?: "Undefined"}.")
             }
         }
@@ -88,19 +88,19 @@ class MainViewModel : ViewModel() {
         val timeout = 1.0 //seconds
         val callback = object : AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>> {
             override fun call(propositions: Map<DecisionScope, OptimizeProposition>?) {
-                logManager.addLog("Getting Propositions | Success")
+                logBoxManager.addLog("Getting Propositions | Success")
                 propositions?.forEach {
                     optimizePropositionStateMap[it.key.name] = it.value
                 }
             }
 
             override fun fail(error: AdobeError?) {
-                logManager.addLog("Getting Propositions | Failed | ${error?.errorName}")
+                logBoxManager.addLog("Getting Propositions | Failed | ${error?.errorName}")
                 print("Error in getting Propositions.")
             }
         }
 
-        logManager.addLog("Getting Propositions Called")
+        logBoxManager.addLog("Getting Propositions Called")
         Optimize.getPropositions(
             decisionScopeList,
             timeout,
@@ -118,12 +118,12 @@ class MainViewModel : ViewModel() {
         val callback =
             object : AdobeCallbackWithOptimizeError<Map<DecisionScope, OptimizeProposition>> {
                 override fun call(propositions: Map<DecisionScope, OptimizeProposition>?) {
-                    logManager.addLog("Update Propositions | Success")
+                    logBoxManager.addLog("Update Propositions | Success")
                     Log.i("Optimize Test App", "Propositions updated successfully.")
                 }
 
                 override fun fail(error: AEPOptimizeError?) {
-                    logManager.addLog("Update Propositions | Failed | ${error?.title}")
+                    logBoxManager.addLog("Update Propositions | Failed | ${error?.title}")
                     Log.i(
                         "Optimize Test App",
                         "Error in updating Propositions:: ${error?.title ?: "Undefined"}."
@@ -132,7 +132,7 @@ class MainViewModel : ViewModel() {
             }
 
         optimizePropositionStateMap.clear()
-        logManager.addLog("Update Propositions Called")
+        logBoxManager.addLog("Update Propositions Called")
         Optimize.updatePropositions(
             decisionScopeList,
             mapOf(Pair("xdmKey", "1234")),
@@ -146,7 +146,7 @@ class MainViewModel : ViewModel() {
      * Calls the Optimize SDK API to clear the cached Propositions [Optimize.clearCachedPropositions]
      */
     fun clearCachedPropositions() {
-        logManager.addLog("Clearing Propositions")
+        logBoxManager.addLog("Clearing Propositions")
         optimizePropositionStateMap.clear()
         Optimize.clearCachedPropositions()
     }
