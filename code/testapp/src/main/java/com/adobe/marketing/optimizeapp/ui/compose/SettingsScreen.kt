@@ -14,15 +14,20 @@ package com.adobe.marketing.optimizeapp.ui.compose
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.MutableDoubleState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ChainStyle
@@ -77,6 +82,8 @@ fun SettingsView(viewModel: MainViewModel) {
             SettingsLabel(text = "Target Parameters - Product", align = TextAlign.Center, textStyle = MaterialTheme.typography.subtitle2)
             SettingsTextField(value = viewModel.textTargetProductId, placeholder = "Enter Product Id") { viewModel.textTargetProductId = it }
             SettingsTextField(value = viewModel.textTargetProductCategoryId, placeholder = "Enter Product Category id") { viewModel.textTargetProductCategoryId = it }
+            SettingsLabel(text = "Preferences", align = TextAlign.Center, textStyle = MaterialTheme.typography.subtitle2)
+            SettingsDoubleField(state = viewModel.timeoutConfig)
             SettingsLabel(text = "About", align = TextAlign.Start, textStyle = MaterialTheme.typography.subtitle1)
             VersionLabel(viewModel.getOptimizeExtensionVersion())
         }
@@ -102,6 +109,43 @@ private fun SettingsTextField(value: String, placeholder: String, valueChange: (
         shape = RoundedCornerShape(size = 15.dp),
         colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.White, focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent)
     )
+}
+@Composable
+private fun SettingsDoubleField(state: MutableDoubleState) {
+    val input = remember { mutableStateOf(state.doubleValue.toString()) }
+    val isError = remember { mutableStateOf(false) }
+
+    TextField(
+        value = input.value,
+        onValueChange = { value ->
+            input.value = value
+            isError.value = try {
+                state.doubleValue = value.toDouble()
+                false
+            } catch (e: NumberFormatException) {
+                true
+            }
+        },
+        modifier = Modifier
+            .absolutePadding(left = 20.dp, right = 20.dp, top = 10.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(size = 15.dp),
+        colors = TextFieldDefaults.textFieldColors(
+            backgroundColor = Color.White,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+        isError = isError.value
+    )
+
+    if (isError.value) {
+        Text(
+            text = "Invalid number",
+            color = Color.Red,
+            modifier = Modifier.absolutePadding(left = 20.dp, right = 20.dp, top = 5.dp)
+        )
+    }
 }
 
 @Composable
@@ -170,13 +214,13 @@ private fun KeyValuePairRow(pair: OptimizePair, isLastRow: Boolean, onclick: (is
         )
 
         Image(painter = painterResource(id = if(isLastRow) R.drawable.add_circle else R.drawable.remove_circle), contentDescription = null, modifier = Modifier
-                .clickable(enabled = true) {
-                    onclick(isLastRow)
-                }
-                .constrainAs(button) {
-                    end.linkTo(parent.end)
-                    centerVerticallyTo(parent)
-                })
+            .clickable(enabled = true) {
+                onclick(isLastRow)
+            }
+            .constrainAs(button) {
+                end.linkTo(parent.end)
+                centerVerticallyTo(parent)
+            })
 
         createHorizontalChain(
                 key,

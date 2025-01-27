@@ -49,6 +49,9 @@ class MainViewModel : ViewModel() {
 
     var optimizePropositionStateMap = mutableStateMapOf<String, OptimizeProposition>()
 
+    //Preferences
+    var timeoutConfig = mutableDoubleStateOf(5.0) //Seconds
+
     //Visible logs for UI
     val logBoxManager = LogManager()
 
@@ -85,7 +88,6 @@ class MainViewModel : ViewModel() {
         optimizePropositionStateMap.clear()
 
         val decisionScopeList = getDecisionScopes()
-        val timeout = 1.0 //seconds
         val callback = object : AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>> {
             override fun call(propositions: Map<DecisionScope, OptimizeProposition>?) {
                 logBoxManager.addLog("Getting Propositions | Success")
@@ -103,7 +105,7 @@ class MainViewModel : ViewModel() {
         logBoxManager.addLog("Getting Propositions Called")
         Optimize.getPropositions(
             decisionScopeList,
-            timeout,
+            timeoutConfig.doubleValue,
             callback
         )
     }
@@ -137,7 +139,7 @@ class MainViewModel : ViewModel() {
             decisionScopeList,
             mapOf(Pair("xdmKey", "1234")),
             data,
-            5.0,
+            timeoutConfig.doubleValue,
             callback
         )
     }
