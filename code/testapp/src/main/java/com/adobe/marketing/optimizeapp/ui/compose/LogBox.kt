@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -173,7 +172,6 @@ private fun LogView(log: LogEntry, maxLines: Int = Integer.MAX_VALUE) {
         text = "${log.timestamp}: ${log.text}",
         color = Color.White,
         modifier = Modifier.padding(vertical = 2.dp),
-        maxLines = 2,
         overflow = TextOverflow.Ellipsis,
         style = MaterialTheme.typography.body2,
         maxLines = maxLines
