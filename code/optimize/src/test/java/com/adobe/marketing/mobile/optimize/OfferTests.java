@@ -279,6 +279,36 @@ public class OfferTests {
     }
 
     @Test
+    public void testFromEventData_validArrayOffer() throws Exception {
+        Map<String, Object> offerData =
+                new ObjectMapper()
+                        .readValue(
+                                getClass()
+                                        .getClassLoader()
+                                        .getResource("json/OFFER_VALID_LIST.json"),
+                                HashMap.class);
+        final Offer offer = Offer.fromEventData(offerData);
+        Assert.assertNotNull(offer);
+
+        Assert.assertEquals("xcore:personalized-offer:1111111111111111", offer.getId());
+        Assert.assertEquals("8", offer.getEtag());
+        Assert.assertEquals(0, offer.getScore());
+        Assert.assertEquals(
+                "https://ns.adobe.com/experience/offer-management/content-component-json",
+                offer.getSchema());
+        Assert.assertEquals(OfferType.JSON, offer.getType());
+        Assert.assertEquals(1, offer.getLanguage().size());
+        Assert.assertEquals("en-us", offer.getLanguage().get(0));
+        Assert.assertEquals("{\n" +
+                "\"name\":\"John\",\n" +
+                "\"age\":30,\n" +
+                "\"cars\":[\"Ford\", \"BMW\", \"Fiat\"]\n" +
+                "}", offer.getContent());
+        Assert.assertEquals(1, offer.getCharacteristics().size());
+        Assert.assertEquals("true", offer.getCharacteristics().get("mobile"));
+    }
+
+    @Test
     public void testFromEventData_emptyOffer() throws Exception {
         Map<String, Object> offerData =
                 new ObjectMapper()
