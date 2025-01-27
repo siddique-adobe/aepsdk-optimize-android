@@ -50,7 +50,7 @@ class MainViewModel : ViewModel() {
     var optimizePropositionStateMap = mutableStateMapOf<String, OptimizeProposition>()
 
     //Visible logs for UI
-    val logManager = LogManager()
+    val logBoxManager = LogManager()
 
     //Preferences
     var timeoutConfig = mutableDoubleStateOf(5.0) //Seconds
