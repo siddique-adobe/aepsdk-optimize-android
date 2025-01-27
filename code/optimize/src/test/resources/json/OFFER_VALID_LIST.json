@@ -5,7 +5,7 @@
   "data": {
     "id": "xcore:personalized-offer:1111111111111111",
     "format": "application/json",
-    "content": "{\n\"name\":\"John\",\n\"age\":30,\n\"cars\":[\"Ford\", \"BMW\", \"Fiat\"]\n}",
+    "content": "[{\n  \"name\": \"John\",\n  \"age\": 30,\n  \"cars\": [\n    \"Ford\",\n    \"BMW\",\n    \"Fiat\"\n  ]\n}]",
     "language": [
       "en-us"
     ],

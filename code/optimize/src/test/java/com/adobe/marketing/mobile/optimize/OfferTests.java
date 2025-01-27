@@ -299,11 +299,15 @@ public class OfferTests {
         Assert.assertEquals(OfferType.JSON, offer.getType());
         Assert.assertEquals(1, offer.getLanguage().size());
         Assert.assertEquals("en-us", offer.getLanguage().get(0));
-        Assert.assertEquals("{\n" +
-                "\"name\":\"John\",\n" +
-                "\"age\":30,\n" +
-                "\"cars\":[\"Ford\", \"BMW\", \"Fiat\"]\n" +
-                "}", offer.getContent());
+        Assert.assertEquals("[{\n" +
+                "  \"name\": \"John\",\n" +
+                "  \"age\": 30,\n" +
+                "  \"cars\": [\n" +
+                "    \"Ford\",\n" +
+                "    \"BMW\",\n" +
+                "    \"Fiat\"\n" +
+                "  ]\n" +
+                "}]", offer.getContent());
         Assert.assertEquals(1, offer.getCharacteristics().size());
         Assert.assertEquals("true", offer.getCharacteristics().get("mobile"));
     }
