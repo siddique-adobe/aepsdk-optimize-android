@@ -11,12 +11,15 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class LogManager {
+class LogManager(val maxLogCount: Int) {
 
     private val _logs = mutableStateListOf<LogEntry>()
     val logs: List<LogEntry> get() = _logs
 
     fun addLog(log: String) {
+        if (_logs.size >= maxLogCount) {
+            _logs.removeAt(0) // Remove the oldest log
+        }
         _logs.add(
             LogEntry(
                 getTimeStamp(),

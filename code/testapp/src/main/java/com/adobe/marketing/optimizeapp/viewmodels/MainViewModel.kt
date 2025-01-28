@@ -54,7 +54,7 @@ class MainViewModel : ViewModel() {
 
     //Visible logs for UI
     val showLogs = mutableStateOf(true)
-    val logBoxManager = LogManager()
+    val logBoxManager = LogManager(maxLogCount = 200)
 
     //UI Alert Dialog
     private val _dialogContent = mutableStateOf("")
