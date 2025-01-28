@@ -68,6 +68,7 @@ class MainViewModel : ViewModel() {
         _dialogContent.value = ""
     }
 
+    //This callback is triggered when there is an update in the propositions.
     private val optimizePropositionUpdateCallback =
         object : AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>> {
             override fun call(propositions: Map<DecisionScope, OptimizeProposition>?) {
@@ -97,7 +98,7 @@ class MainViewModel : ViewModel() {
     fun getOptimizeExtensionVersion(): String = Optimize.extensionVersion()
 
     /**
-     * Calls the Optimize SDK API to get the Propositions see [Optimize.getPropositions]
+     * Calls the Optimize SDK API to get the Propositions that are already fetched. [Optimize.getPropositions]
      */
     fun getPropositions() {
         optimizePropositionStateMap.clear()
@@ -128,6 +129,9 @@ class MainViewModel : ViewModel() {
         )
     }
 
+    /**
+     * Calls the Optimize SDK API to get the Propositions according to given scopes and other data [Optimize.getPropositions]
+     */
     fun updatePropositions() {
         updateIdentity()
 
@@ -169,7 +173,7 @@ class MainViewModel : ViewModel() {
     }
 
     /**
-     * Calls the Optimize SDK API to clear the cached Propositions [Optimize.clearCachedPropositions]
+     * Calls the Optimize SDK API to clear the cached Propositions  [Optimize.clearCachedPropositions]
      */
     fun clearCachedPropositions() {
         logBoxManager.addLog("Clearing Propositions :\n" +
