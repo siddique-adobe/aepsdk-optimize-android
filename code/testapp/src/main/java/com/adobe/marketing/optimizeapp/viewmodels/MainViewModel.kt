@@ -51,7 +51,7 @@ class MainViewModel : ViewModel() {
 
     //Visible logs for UI
     val showLogs = mutableStateOf(true)
-    val logBoxManager = LogManager()
+    val logBoxManager = LogManager(maxLogCount = 200)
 
     //Preferences
     var timeoutConfig = mutableDoubleStateOf(5.0) //Seconds
