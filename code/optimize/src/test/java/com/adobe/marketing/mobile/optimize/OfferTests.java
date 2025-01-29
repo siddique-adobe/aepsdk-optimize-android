@@ -300,15 +300,7 @@ public class OfferTests {
         Assert.assertEquals(1, offer.getLanguage().size());
         Assert.assertEquals("en-us", offer.getLanguage().get(0));
         Assert.assertEquals(
-                "[{\n"
-                        + "  \"name\": \"John\",\n"
-                        + "  \"age\": 30,\n"
-                        + "  \"cars\": [\n"
-                        + "    \"Ford\",\n"
-                        + "    \"BMW\",\n"
-                        + "    \"Fiat\"\n"
-                        + "  ]\n"
-                        + "}]",
+                "[{\"cars\":[\"Ford\",\"BMW\",\"Fiat\"],\"name\":\"John\",\"age\":30}]",
                 offer.getContent());
         Assert.assertEquals(1, offer.getCharacteristics().size());
         Assert.assertEquals("true", offer.getCharacteristics().get("mobile"));
