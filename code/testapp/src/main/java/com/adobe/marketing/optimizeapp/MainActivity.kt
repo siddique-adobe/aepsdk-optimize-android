@@ -18,6 +18,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.adobe.marketing.mobile.MobileCore
+import com.adobe.marketing.optimizeapp.ui.compose.MainScreen
 import com.adobe.marketing.optimizeapp.ui.theme.OptimizeTheme
 import com.adobe.marketing.optimizeapp.viewmodels.MainViewModel
 
