@@ -602,27 +602,26 @@ public class Offer {
     }
 
     private static String getContentFromOfferData(final Map<String, Object> offerData) {
-        String content = null;
-        Object jsonData = null;
+        Object data = null;
 
         // Check if offerData contains an array or a dictionary
         Object offerContent = offerData.get(OptimizeConstants.JsonKeys.PAYLOAD_ITEM_DATA_CONTENT);
         if (offerContent instanceof List) {
             // If it's a list (array)
-            jsonData = new JSONArray((List<?>) offerContent);
+            data = new JSONArray((List<?>) offerContent);
         } else if (offerContent instanceof Map) {
             // If it's a map (dictionary)
-            jsonData = new JSONObject((Map<?, ?>) offerContent);
+            data = new JSONObject((Map<?, ?>) offerContent);
         } else if (offerContent instanceof String) {
             // If it's a string
-            content = (String) offerContent;
+            data = offerContent;
         }
 
-        // Convert jsonData to a JSON string
-        if (jsonData != null) {
-            content = jsonData.toString();
+        // Convert data to a JSON string
+        if (data != null) {
+            return data.toString();
+        } else {
+            return null;
         }
-
-        return content;
     }
 }
