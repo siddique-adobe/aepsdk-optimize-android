@@ -72,9 +72,6 @@ public class OfferTests {
     }
 
     @Test
-    public void testToEventData() {}
-
-    @Test
     public void testFromEventData_validJsonOffer() throws Exception {
         Map<String, Object> offerData =
                 new ObjectMapper()
