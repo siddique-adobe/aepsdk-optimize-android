@@ -81,8 +81,7 @@ class MainViewModel : ViewModel() {
 
             override fun fail(error: AdobeError?) {
                 showDialog("Error in updating OptimizeProposition:: ${error?.errorName ?: "Undefined"}.")
-                logBoxManager.addLog("onUpdateProposition | Failed | ${error?.errorName}")
-                print("Error in updating OptimizeProposition:: ${error?.errorName ?: "Undefined"}.")
+                logBoxManager.addLog("onUpdateProposition | Failed | ${error?.errorName}")print("Error in updating OptimizeProposition:: ${error?.errorName ?: "Undefined"}.")
             }
         }
 
@@ -150,14 +149,12 @@ class MainViewModel : ViewModel() {
 
                 override fun fail(error: AEPOptimizeError?) {
                     showDialog("Error in Update Propositions:: ${error?.adobeError?.errorName ?: "Undefined"}.")
-                    logBoxManager.addLog("Update Propositions | Failed | ${error?.adobeError?.errorName}")
-                    Log.i(
+                    logBoxManager.addLog("Update Propositions | Failed | ${error?.adobeError?.errorName}")Log.i(
                         "Optimize Test App",
                         "Error in updating Propositions:: ${error?.title ?: "Undefined"}."
                     )
                 }
             }
-
         optimizePropositionStateMap.clear()
         logBoxManager.addLog("Update Propositions Called | ${decisionScopeList.size} scopes \n" +
                 "Decision Scopes: ${decisionScopeList.joinToString { it.name }}\n" +
