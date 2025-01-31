@@ -50,7 +50,7 @@ fun MainScreen(viewModel: MainViewModel) {
         topBar = {
             TopAppBar {
                 Text(
-                    text = "$appBarTitle",
+                    text = appBarTitle,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.h6

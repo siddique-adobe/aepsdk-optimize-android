@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        MobileCore.setApplication(getApplication())
+        MobileCore.setApplication(application)
         MobileCore.lifecycleStart(null)
     }
 
@@ -44,12 +44,11 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
+    val mockViewModel = MainViewModel()
     OptimizeTheme {
-//        MainScreen()
+        MainScreen(viewModel = mockViewModel)
     }
 }
