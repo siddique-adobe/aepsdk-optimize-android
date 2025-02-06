@@ -17,6 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableDoubleState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.MutableDoubleState
 import androidx.compose.runtime.mutableStateOf
