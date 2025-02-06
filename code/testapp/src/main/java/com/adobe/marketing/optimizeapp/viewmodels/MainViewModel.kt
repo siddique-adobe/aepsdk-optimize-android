@@ -49,10 +49,6 @@ class MainViewModel : ViewModel() {
 
     var optimizePropositionStateMap = mutableStateMapOf<String, OptimizeProposition>()
 
-    //Visible logs for UI
-    val showLogs = mutableStateOf(true)
-    val logBoxManager = LogManager(maxLogCount = 200)
-
     //Preferences
     var timeoutConfig = mutableDoubleStateOf(5.0) //Seconds
 
@@ -85,7 +81,8 @@ class MainViewModel : ViewModel() {
 
             override fun fail(error: AdobeError?) {
                 showDialog("Error in updating OptimizeProposition:: ${error?.errorName ?: "Undefined"}.")
-                logBoxManager.addLog("onUpdateProposition | Failed | ${error?.errorName}")print("Error in updating OptimizeProposition:: ${error?.errorName ?: "Undefined"}.")
+                logBoxManager.addLog("onUpdateProposition | Failed | ${error?.errorName}")
+                print("Error in updating OptimizeProposition:: ${error?.errorName ?: "Undefined"}.")
             }
         }
 
@@ -153,7 +150,8 @@ class MainViewModel : ViewModel() {
 
                 override fun fail(error: AEPOptimizeError?) {
                     showDialog("Error in Update Propositions:: ${error?.adobeError?.errorName ?: "Undefined"}.")
-                    logBoxManager.addLog("Update Propositions | Failed | ${error?.adobeError?.errorName}")Log.i(
+                    logBoxManager.addLog("Update Propositions | Failed | ${error?.adobeError?.errorName}")
+                    Log.i(
                         "Optimize Test App",
                         "Error in updating Propositions:: ${error?.title ?: "Undefined"}."
                     )
