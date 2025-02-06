@@ -157,7 +157,6 @@ class MainViewModel : ViewModel() {
                     )
                 }
             }
-
         optimizePropositionStateMap.clear()
         logBoxManager.addLog("Update Propositions Called | ${decisionScopeList.size} scopes \n" +
                 "Decision Scopes: ${decisionScopeList.joinToString { it.name }}\n" +
