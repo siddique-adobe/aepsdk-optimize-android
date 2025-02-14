@@ -2260,6 +2260,62 @@ public class OptimizeExtensionTests {
     }
 
     @Test
+    public void testHandleDebugEvent_debugDataWrongSource() throws Exception {
+        // setup
+        final Map<String, Object> invalidResponse =
+                new ObjectMapper()
+                        .readValue(
+                                getClass()
+                                        .getClassLoader()
+                                        .getResource(
+                                                "json/EVENT_DEBUG_DATA_EDGE_RESPONSE_INVALID_SOURCE.json"),
+                                HashMap.class);
+        final Event testEvent =
+                new Event.Builder(
+                                "AEP Response Event Handle (Spoof)",
+                                "com.adobe.eventType.system",
+                                "com.adobe.eventSource.debug")
+                        .setEventData(invalidResponse)
+                        .build();
+
+        final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+
+        // test
+        extension.handleDebugEvent(testEvent);
+
+        // verify
+        Mockito.verify(mockExtensionApi, Mockito.never()).dispatch(eventCaptor.capture());
+    }
+
+    @Test
+    public void testHandleDebugEvent_debugDataWrongType() throws Exception {
+        // setup
+        final Map<String, Object> edgeResponseData =
+                new ObjectMapper()
+                        .readValue(
+                                getClass()
+                                        .getClassLoader()
+                                        .getResource(
+                                                "json/EVENT_DEBUG_DATA_EDGE_RESPONSE_INVALID_TYPE.json"),
+                                HashMap.class);
+        final Event testEvent =
+                new Event.Builder(
+                                "AEP Response Event Handle (Spoof)",
+                                "com.adobe.eventType.system",
+                                "com.adobe.eventSource.debug")
+                        .setEventData(edgeResponseData)
+                        .build();
+
+        final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+
+        // test
+        extension.handleDebugEvent(testEvent);
+
+        // verify
+        Mockito.verify(mockExtensionApi, Mockito.never()).dispatch(eventCaptor.capture());
+    }
+
+    @Test
     public void testHandleDebugEvent_validProposition() throws Exception {
         // setup
         final Map<String, Object> edgeResponseData =
