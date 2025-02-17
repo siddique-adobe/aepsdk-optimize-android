@@ -34,7 +34,7 @@ class ConfigsUtilsTests {
         every { mockEvent.eventData } returns null
         val configData = mapOf<String, Any?>()
 
-        Assert.assertEquals(10, mockEvent.retrieveOptimizeRequestTimeout(configData))
+        Assert.assertEquals(10000, mockEvent.retrieveOptimizeRequestTimeout(configData))
     }
 
     @Test
@@ -50,7 +50,7 @@ class ConfigsUtilsTests {
     fun `returns timeout from configData when eventData contains Long_MAX_VALUE`() {
         val eventData = mapOf(OptimizeConstants.EventDataKeys.TIMEOUT to Long.MAX_VALUE)
         val configData =
-            mapOf<String, Any?>(OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT to 7000L)
+            mapOf<String, Any?>(OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT to 7)
         every { mockEvent.eventData } returns eventData
 
         Assert.assertEquals(7000L, mockEvent.retrieveOptimizeRequestTimeout(configData))
@@ -62,17 +62,17 @@ class ConfigsUtilsTests {
         val configData = mapOf<String, Any?>()
         every { mockEvent.eventData } returns eventData
 
-        Assert.assertEquals(10, mockEvent.retrieveOptimizeRequestTimeout(configData))
+        Assert.assertEquals(10000, mockEvent.retrieveOptimizeRequestTimeout(configData))
     }
 
     @Test
     fun `returns default timeout when DataReaderException is thrown`() {
         val eventData = mapOf(OptimizeConstants.EventDataKeys.TIMEOUT to "invalid_value")
         val configData =
-            mapOf<String, Any?>(OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT to 7000L)
+            mapOf<String, Any?>(OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT to 7)
         every { mockEvent.eventData } returns eventData
 
-        Assert.assertEquals(10, mockEvent.retrieveOptimizeRequestTimeout(configData))
+        Assert.assertEquals(10000, mockEvent.retrieveOptimizeRequestTimeout(configData))
     }
 
     @Test
@@ -82,6 +82,6 @@ class ConfigsUtilsTests {
             mapOf<String, Any?>(OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT to "invalid_value")
         every { mockEvent.eventData } returns eventData
 
-        Assert.assertEquals(10, mockEvent.retrieveOptimizeRequestTimeout(configData))
+        Assert.assertEquals(10000, mockEvent.retrieveOptimizeRequestTimeout(configData))
     }
 }

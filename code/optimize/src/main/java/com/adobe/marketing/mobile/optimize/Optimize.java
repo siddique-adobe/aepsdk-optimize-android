@@ -89,7 +89,9 @@ public class Optimize {
             @Nullable final Map<String, Object> xdm,
             @Nullable final Map<String, Object> data,
             @Nullable final AdobeCallback<Map<DecisionScope, OptimizeProposition>> callback) {
-        updatePropositionsInternal(decisionScopes, xdm, data, Long.MAX_VALUE, callback);
+        final double defaultTimeoutSeconds =
+                (double) Long.MAX_VALUE / OptimizeConstants.TIMEOUT_CONVERSION_FACTOR;
+        updatePropositionsInternal(decisionScopes, xdm, data, defaultTimeoutSeconds, callback);
     }
 
     /**
@@ -278,8 +280,8 @@ public class Optimize {
     public static void getPropositions(
             @NonNull final List<DecisionScope> decisionScopes,
             @NonNull final AdobeCallback<Map<DecisionScope, OptimizeProposition>> callback) {
-        getPropositionsInternal(
-                decisionScopes, OptimizeConstants.GET_RESPONSE_CALLBACK_TIMEOUT, callback);
+        final double defaultTimeoutSeconds = OptimizeConstants.GET_RESPONSE_CALLBACK_TIMEOUT;
+        getPropositionsInternal(decisionScopes, defaultTimeoutSeconds, callback);
     }
 
     /**
