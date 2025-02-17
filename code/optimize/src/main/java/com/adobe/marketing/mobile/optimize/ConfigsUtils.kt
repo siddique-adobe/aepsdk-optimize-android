@@ -12,29 +12,10 @@
 package com.adobe.marketing.mobile.optimize
 
 import com.adobe.marketing.mobile.Event
-import com.adobe.marketing.mobile.ExtensionApi
-import com.adobe.marketing.mobile.SharedStateResolution
 import com.adobe.marketing.mobile.util.DataReader
 import com.adobe.marketing.mobile.util.DataReaderException
 
 object ConfigsUtils {
-    /**
-     * Retrieves the `Configuration` shared state versioned at the current `event`.
-     *
-     * @param event incoming [Event] instance.
-     * @return `Map<String, Object>` containing configuration data.
-     */
-    @JvmStatic
-    @JvmOverloads
-    fun ExtensionApi.retrieveConfigurationSharedState(
-        event: Event? = null
-    ): Map<String, Any>? = getSharedState(
-        OptimizeConstants.Configuration.EXTENSION_NAME,
-        event,
-        false,
-        SharedStateResolution.ANY
-    )?.value
-
     @JvmStatic
     fun Event.retrieveOptimizeRequestTimeout(configData: Map<String, Any?>): Long {
         val defaultTimeout = OptimizeConstants.UPDATE_RESPONSE_DEFAULT_TIMEOUT.toLong()
@@ -42,7 +23,7 @@ object ConfigsUtils {
             val eventTimeout = DataReader.getLong(eventData, OptimizeConstants.EventDataKeys.TIMEOUT)
             if (eventTimeout == Long.MAX_VALUE)
                 DataReader.getLong(configData, OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT)
-             else eventTimeout
+            else eventTimeout
         } catch (e: DataReaderException) {
             defaultTimeout
         }

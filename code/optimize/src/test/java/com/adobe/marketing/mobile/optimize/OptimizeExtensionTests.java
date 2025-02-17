@@ -1539,101 +1539,112 @@ public class OptimizeExtensionTests {
                                             java.util.Base64.getDecoder()
                                                     .decode((String) invocation.getArguments()[0]));
 
-            // setup
-            setConfigurationSharedState(
-                    SharedStateStatus.SET,
-                    new HashMap<String, Object>() {
-                        {
-                            put("edge.configId", "ffffffff-ffff-ffff-ffff-ffffffffffff");
-                        }
-                    });
+            try (MockedStatic<ConfigsUtils> configsUtilsMockedStatic =
+                    Mockito.mockStatic(ConfigsUtils.class)) {
+                configsUtilsMockedStatic
+                        .when(
+                                () ->
+                                        ConfigsUtils.retrieveOptimizeRequestTimeout(
+                                                ArgumentMatchers.any(), ArgumentMatchers.anyMap()))
+                        .thenReturn(5000L);
 
-            final DecisionScope testScope =
-                    new DecisionScope(
-                            "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ==");
-            final Map<String, Object> testEventData = new HashMap<>();
-            testEventData.put("requesttype", "updatepropositions");
-            testEventData.put(
-                    "decisionscopes",
-                    new ArrayList<Map<String, Object>>() {
-                        {
-                            add(testScope.toEventData());
-                        }
-                    });
-            final Event testEvent =
-                    new Event.Builder(
-                                    "Optimize Update Propositions Request",
-                                    "com.adobe.eventType.optimize",
-                                    "com.adobe.eventSource.requestContent")
-                            .setEventData(testEventData)
-                            .build();
+                // setup
+                setConfigurationSharedState(
+                        SharedStateStatus.SET,
+                        new HashMap<String, Object>() {
+                            {
+                                put("edge.configId", "ffffffff-ffff-ffff-ffff-ffffffffffff");
+                            }
+                        });
 
-            // simulate update
-            extension.handleOptimizeRequestContent(testEvent);
+                final DecisionScope testScope =
+                        new DecisionScope(
+                                "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ==");
+                final Map<String, Object> testEventData = new HashMap<>();
+                testEventData.put("requesttype", "updatepropositions");
+                testEventData.put(
+                        "decisionscopes",
+                        new ArrayList<Map<String, Object>>() {
+                            {
+                                add(testScope.toEventData());
+                            }
+                        });
+                final Event testEvent =
+                        new Event.Builder(
+                                        "Optimize Update Propositions Request",
+                                        "com.adobe.eventType.optimize",
+                                        "com.adobe.eventSource.requestContent")
+                                .setEventData(testEventData)
+                                .build();
 
-            // verify
-            final Map<String, List<DecisionScope>> updateEventIdsInProgress =
-                    extension.getUpdateRequestEventIdsInProgress();
-            Assert.assertNotNull(updateEventIdsInProgress);
-            Assert.assertEquals(1, updateEventIdsInProgress.size());
-            Assert.assertTrue(
-                    updateEventIdsInProgress.containsValue(
-                            new ArrayList<DecisionScope>() {
-                                {
-                                    add(testScope);
-                                }
-                            }));
-            Mockito.clearInvocations(mockExtensionApi);
+                // simulate update
+                extension.handleOptimizeRequestContent(testEvent);
 
-            // simulate get
-            final Map<String, Object> testGetEventData = new HashMap<>();
-            testGetEventData.put("requesttype", "getpropositions");
-            testGetEventData.put(
-                    "decisionscopes",
-                    new ArrayList<Map<String, Object>>() {
-                        {
-                            add(testScope.toEventData());
-                        }
-                    });
+                // verify
+                final Map<String, List<DecisionScope>> updateEventIdsInProgress =
+                        extension.getUpdateRequestEventIdsInProgress();
+                Assert.assertNotNull(updateEventIdsInProgress);
+                Assert.assertEquals(1, updateEventIdsInProgress.size());
+                Assert.assertTrue(
+                        updateEventIdsInProgress.containsValue(
+                                new ArrayList<DecisionScope>() {
+                                    {
+                                        add(testScope);
+                                    }
+                                }));
+                Mockito.clearInvocations(mockExtensionApi);
 
-            final Event testGetEvent =
-                    new Event.Builder(
-                                    "Optimize Get Propositions Request",
-                                    "com.adobe.eventType.optimize",
-                                    "com.adobe.eventSource.requestContent")
-                            .setEventData(testGetEventData)
-                            .build();
+                // simulate get
+                final Map<String, Object> testGetEventData = new HashMap<>();
+                testGetEventData.put("requesttype", "getpropositions");
+                testGetEventData.put(
+                        "decisionscopes",
+                        new ArrayList<Map<String, Object>>() {
+                            {
+                                add(testScope.toEventData());
+                            }
+                        });
 
-            // simulate update complete
-            final Event testUpdateCompleteEvent =
-                    new Event.Builder(
-                                    "Optimize Update Propositions Complete",
-                                    "com.adobe.eventType.optimize",
-                                    "com.adobe.eventSource.contentComplete")
-                            .setEventData(
-                                    new HashMap<String, Object>() {
-                                        {
-                                            put(
-                                                    "completedUpdateRequestForEventId",
-                                                    updateEventIdsInProgress.keySet().toArray()[0]);
-                                        }
-                                    })
-                            .build();
+                final Event testGetEvent =
+                        new Event.Builder(
+                                        "Optimize Get Propositions Request",
+                                        "com.adobe.eventType.optimize",
+                                        "com.adobe.eventSource.requestContent")
+                                .setEventData(testGetEventData)
+                                .build();
 
-            final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+                // simulate update complete
+                final Event testUpdateCompleteEvent =
+                        new Event.Builder(
+                                        "Optimize Update Propositions Complete",
+                                        "com.adobe.eventType.optimize",
+                                        "com.adobe.eventSource.contentComplete")
+                                .setEventData(
+                                        new HashMap<String, Object>() {
+                                            {
+                                                put(
+                                                        "completedUpdateRequestForEventId",
+                                                        updateEventIdsInProgress.keySet()
+                                                                .toArray()[0]);
+                                            }
+                                        })
+                                .build();
 
-            // test
-            extension.handleOptimizeRequestContent(testGetEvent);
-            extension.handleUpdatePropositionsCompleted(testUpdateCompleteEvent);
+                final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
 
-            // verify
-            Mockito.verify(mockExtensionApi, Mockito.after(2000L).times(1))
-                    .dispatch(eventCaptor.capture());
-            final Event dispatchedEvent = eventCaptor.getValue();
-            Assert.assertEquals("Optimize Response", dispatchedEvent.getName());
-            Assert.assertEquals("com.adobe.eventType.optimize", dispatchedEvent.getType());
-            Assert.assertEquals(
-                    "com.adobe.eventSource.responseContent", dispatchedEvent.getSource());
+                // test
+                extension.handleOptimizeRequestContent(testGetEvent);
+                extension.handleUpdatePropositionsCompleted(testUpdateCompleteEvent);
+
+                // verify
+                Mockito.verify(mockExtensionApi, Mockito.after(2000L).times(1))
+                        .dispatch(eventCaptor.capture());
+                final Event dispatchedEvent = eventCaptor.getValue();
+                Assert.assertEquals("Optimize Response", dispatchedEvent.getName());
+                Assert.assertEquals("com.adobe.eventType.optimize", dispatchedEvent.getType());
+                Assert.assertEquals(
+                        "com.adobe.eventSource.responseContent", dispatchedEvent.getSource());
+            }
         }
     }
 
@@ -2682,137 +2693,148 @@ public class OptimizeExtensionTests {
                                             java.util.Base64.getDecoder()
                                                     .decode((String) invocation.getArguments()[0]));
 
-            // setup
-            setConfigurationSharedState(
-                    SharedStateStatus.SET,
-                    new HashMap<String, Object>() {
-                        {
-                            put("edge.configId", "ffffffff-ffff-ffff-ffff-ffffffffffff");
-                        }
-                    });
+            try (MockedStatic<ConfigsUtils> configsUtilsMockedStatic =
+                    Mockito.mockStatic(ConfigsUtils.class)) {
+                configsUtilsMockedStatic
+                        .when(
+                                () ->
+                                        ConfigsUtils.retrieveOptimizeRequestTimeout(
+                                                ArgumentMatchers.any(), ArgumentMatchers.anyMap()))
+                        .thenReturn(5000L);
 
-            extension.setEventsDispatcher(mockEventsDispatcher);
+                // setup
+                setConfigurationSharedState(
+                        SharedStateStatus.SET,
+                        new HashMap<String, Object>() {
+                            {
+                                put("edge.configId", "ffffffff-ffff-ffff-ffff-ffffffffffff");
+                            }
+                        });
 
-            // prepare update event
-            final DecisionScope updateScope =
-                    new DecisionScope(
-                            "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ==");
-            final Map<String, Object> testEventData = new HashMap<>();
-            testEventData.put("requesttype", "updatepropositions");
-            testEventData.put(
-                    "decisionscopes",
-                    new ArrayList<Map<String, Object>>() {
-                        {
-                            add(updateScope.toEventData());
-                        }
-                    });
-            final Event updateEvent =
-                    new Event.Builder(
-                                    "Optimize Update Propositions Request",
-                                    "com.adobe.eventType.optimize",
-                                    "com.adobe.eventSource.requestContent")
-                            .setEventData(testEventData)
-                            .build();
+                extension.setEventsDispatcher(mockEventsDispatcher);
 
-            // prepare cache data
-            final Map<String, Object> testPropositionData =
-                    new ObjectMapper()
-                            .readValue(
-                                    getClass()
-                                            .getClassLoader()
-                                            .getResource("json/PROPOSITION_VALID.json"),
-                                    HashMap.class);
+                // prepare update event
+                final DecisionScope updateScope =
+                        new DecisionScope(
+                                "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ==");
+                final Map<String, Object> testEventData = new HashMap<>();
+                testEventData.put("requesttype", "updatepropositions");
+                testEventData.put(
+                        "decisionscopes",
+                        new ArrayList<Map<String, Object>>() {
+                            {
+                                add(updateScope.toEventData());
+                            }
+                        });
+                final Event updateEvent =
+                        new Event.Builder(
+                                        "Optimize Update Propositions Request",
+                                        "com.adobe.eventType.optimize",
+                                        "com.adobe.eventSource.requestContent")
+                                .setEventData(testEventData)
+                                .build();
 
-            final OptimizeProposition testOptimizeProposition =
-                    OptimizeProposition.fromEventData(testPropositionData);
-            final DecisionScope getPropositionScope =
-                    new DecisionScope(testOptimizeProposition.getScope());
-            Assert.assertNotNull(testOptimizeProposition);
-            final Map<DecisionScope, OptimizeProposition> cachedPropositions = new HashMap<>();
-            cachedPropositions.put(getPropositionScope, testOptimizeProposition);
-            // update cache
-            extension.setCachedPropositions(cachedPropositions);
+                // prepare cache data
+                final Map<String, Object> testPropositionData =
+                        new ObjectMapper()
+                                .readValue(
+                                        getClass()
+                                                .getClassLoader()
+                                                .getResource("json/PROPOSITION_VALID.json"),
+                                        HashMap.class);
 
-            // simulate update
-            extension.handleOptimizeRequestContent(updateEvent);
+                final OptimizeProposition testOptimizeProposition =
+                        OptimizeProposition.fromEventData(testPropositionData);
+                final DecisionScope getPropositionScope =
+                        new DecisionScope(testOptimizeProposition.getScope());
+                Assert.assertNotNull(testOptimizeProposition);
+                final Map<DecisionScope, OptimizeProposition> cachedPropositions = new HashMap<>();
+                cachedPropositions.put(getPropositionScope, testOptimizeProposition);
+                // update cache
+                extension.setCachedPropositions(cachedPropositions);
 
-            // verify update in progress
-            final Map<String, List<DecisionScope>> updateEventIdsInProgress =
-                    extension.getUpdateRequestEventIdsInProgress();
-            Assert.assertNotNull(updateEventIdsInProgress);
-            Assert.assertEquals(1, updateEventIdsInProgress.size());
-            Assert.assertTrue(
-                    updateEventIdsInProgress.containsValue(
-                            new ArrayList<DecisionScope>() {
-                                {
-                                    add(updateScope);
-                                }
-                            }));
-            Mockito.clearInvocations(mockExtensionApi);
+                // simulate update
+                extension.handleOptimizeRequestContent(updateEvent);
 
-            // prepare get event
-            final Map<String, Object> testGetEventData = new HashMap<>();
-            testGetEventData.put("requesttype", "getpropositions");
-            testGetEventData.put(
-                    "decisionscopes",
-                    new ArrayList<Map<String, Object>>() {
-                        {
-                            add(getPropositionScope.toEventData());
-                        }
-                    });
+                // verify update in progress
+                final Map<String, List<DecisionScope>> updateEventIdsInProgress =
+                        extension.getUpdateRequestEventIdsInProgress();
+                Assert.assertNotNull(updateEventIdsInProgress);
+                Assert.assertEquals(1, updateEventIdsInProgress.size());
+                Assert.assertTrue(
+                        updateEventIdsInProgress.containsValue(
+                                new ArrayList<DecisionScope>() {
+                                    {
+                                        add(updateScope);
+                                    }
+                                }));
+                Mockito.clearInvocations(mockExtensionApi);
 
-            final Event testGetEvent =
-                    new Event.Builder(
-                                    "Optimize Get Propositions Request",
-                                    "com.adobe.eventType.optimize",
-                                    "com.adobe.eventSource.requestContent")
-                            .setEventData(testGetEventData)
-                            .build();
+                // prepare get event
+                final Map<String, Object> testGetEventData = new HashMap<>();
+                testGetEventData.put("requesttype", "getpropositions");
+                testGetEventData.put(
+                        "decisionscopes",
+                        new ArrayList<Map<String, Object>>() {
+                            {
+                                add(getPropositionScope.toEventData());
+                            }
+                        });
 
-            // prepare update complete event
-            final Event testUpdateCompleteEvent =
-                    new Event.Builder(
-                                    "Optimize Update Propositions Complete",
-                                    "com.adobe.eventType.optimize",
-                                    "com.adobe.eventSource.contentComplete")
-                            .setEventData(
-                                    new HashMap<String, Object>() {
-                                        {
-                                            put(
-                                                    "completedUpdateRequestForEventId",
-                                                    updateEventIdsInProgress.keySet().toArray()[0]);
-                                        }
-                                    })
-                            .build();
+                final Event testGetEvent =
+                        new Event.Builder(
+                                        "Optimize Get Propositions Request",
+                                        "com.adobe.eventType.optimize",
+                                        "com.adobe.eventSource.requestContent")
+                                .setEventData(testGetEventData)
+                                .build();
 
-            final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
+                // prepare update complete event
+                final Event testUpdateCompleteEvent =
+                        new Event.Builder(
+                                        "Optimize Update Propositions Complete",
+                                        "com.adobe.eventType.optimize",
+                                        "com.adobe.eventSource.contentComplete")
+                                .setEventData(
+                                        new HashMap<String, Object>() {
+                                            {
+                                                put(
+                                                        "completedUpdateRequestForEventId",
+                                                        updateEventIdsInProgress.keySet()
+                                                                .toArray()[0]);
+                                            }
+                                        })
+                                .build();
 
-            // simulate test
-            extension.handleOptimizeRequestContent(testGetEvent);
-            extension.handleUpdatePropositionsCompleted(testUpdateCompleteEvent);
+                final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
 
-            // verify
-            Mockito.verify(mockExtensionApi, Mockito.after(2000L).times(1))
-                    .dispatch(eventCaptor.capture());
-            final Event dispatchedEvent = eventCaptor.getValue();
-            Assert.assertEquals("Optimize Response", dispatchedEvent.getName());
-            Assert.assertEquals("com.adobe.eventType.optimize", dispatchedEvent.getType());
-            Assert.assertEquals(
-                    "com.adobe.eventSource.responseContent", dispatchedEvent.getSource());
-            final List<Map<String, Object>> propositionsList =
-                    (List<Map<String, Object>>) dispatchedEvent.getEventData().get("propositions");
-            final Map<DecisionScope, OptimizeProposition> cachedPropositionsAfter =
-                    extension.getCachedPropositions();
-            Assert.assertEquals(1, cachedPropositionsAfter.size());
-            Assert.assertEquals(
-                    getPropositionScope.getName(), propositionsList.get(0).get("scope"));
-            Assert.assertEquals(
-                    "de03ac85-802a-4331-a905-a57053164d35", propositionsList.get(0).get("id"));
-            Assert.assertEquals(
-                    cachedPropositionsAfter.get(getPropositionScope).getId(),
-                    propositionsList.get(0).get("id"));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+                // simulate test
+                extension.handleOptimizeRequestContent(testGetEvent);
+                extension.handleUpdatePropositionsCompleted(testUpdateCompleteEvent);
+                // verify
+                Mockito.verify(mockExtensionApi, Mockito.after(2000L).times(1))
+                        .dispatch(eventCaptor.capture());
+                final Event dispatchedEvent = eventCaptor.getValue();
+                Assert.assertEquals("Optimize Response", dispatchedEvent.getName());
+                Assert.assertEquals("com.adobe.eventType.optimize", dispatchedEvent.getType());
+                Assert.assertEquals(
+                        "com.adobe.eventSource.responseContent", dispatchedEvent.getSource());
+                final List<Map<String, Object>> propositionsList =
+                        (List<Map<String, Object>>)
+                                dispatchedEvent.getEventData().get("propositions");
+                final Map<DecisionScope, OptimizeProposition> cachedPropositionsAfter =
+                        extension.getCachedPropositions();
+                Assert.assertEquals(1, cachedPropositionsAfter.size());
+                Assert.assertEquals(
+                        getPropositionScope.getName(), propositionsList.get(0).get("scope"));
+                Assert.assertEquals(
+                        "de03ac85-802a-4331-a905-a57053164d35", propositionsList.get(0).get("id"));
+                Assert.assertEquals(
+                        cachedPropositionsAfter.get(getPropositionScope).getId(),
+                        propositionsList.get(0).get("id"));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

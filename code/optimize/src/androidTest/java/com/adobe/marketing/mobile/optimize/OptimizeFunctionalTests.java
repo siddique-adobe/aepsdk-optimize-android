@@ -552,6 +552,7 @@ public class OptimizeFunctionalTests {
         // setup
         final Map<String, Object> configData = new HashMap<>();
         configData.put("edge.configId", "ffffffff-ffff-ffff-ffff-ffffffffffff");
+        configData.put("optimize.timeout", 5000L);
         updateConfiguration(configData);
 
         final String decisionScopeString =
@@ -714,6 +715,7 @@ public class OptimizeFunctionalTests {
         // setup
         final Map<String, Object> configData = new HashMap<>();
         configData.put("edge.configId", "ffffffff-ffff-ffff-ffff-ffffffffffff");
+        configData.put("optimize.timeout", "5000L");
         updateConfiguration(configData);
 
         final String decisionScopeString = "someDecisionScope";
@@ -883,6 +885,7 @@ public class OptimizeFunctionalTests {
         // setup
         final Map<String, Object> configData = new HashMap<>();
         configData.put("edge.configId", "ffffffff-ffff-ffff-ffff-ffffffffffff");
+        configData.put("optimize.timeout", 5000L);
         updateConfiguration(configData);
 
         final String decisionScopeString = "myMbox1";
@@ -1115,6 +1118,7 @@ public class OptimizeFunctionalTests {
         // setup
         final Map<String, Object> configData = new HashMap<>();
         configData.put("edge.configId", "ffffffff-ffff-ffff-ffff-ffffffffffff");
+        configData.put("optimize.timeout", 5000L);
         updateConfiguration(configData);
 
         final String decisionScopeString =
@@ -1244,7 +1248,6 @@ public class OptimizeFunctionalTests {
                 TestHelper.getDispatchedEventsWith(
                         OptimizeTestConstants.EventType.OPTIMIZE,
                         OptimizeTestConstants.EventSource.RESPONSE_CONTENT);
-
         Assert.assertNotNull(optimizeResponseEventsList);
 
         Assert.assertEquals(1, optimizeResponseEventsList.size());
@@ -1703,6 +1706,7 @@ public class OptimizeFunctionalTests {
         // setup
         final Map<String, Object> configData = new HashMap<>();
         configData.put("edge.configId", "ffffffff-ffff-ffff-ffff-ffffffffffff");
+        configData.put("optimize.timeout", 5000L);
         updateConfiguration(configData);
 
         final String decisionScopeString =
@@ -1864,6 +1868,7 @@ public class OptimizeFunctionalTests {
         // setup
         final Map<String, Object> configData = new HashMap<>();
         configData.put("edge.configId", "ffffffff-ffff-ffff-ffff-ffffffffffff");
+        configData.put("optimize.timeout", 5000L);
         updateConfiguration(configData);
 
         final String decisionScopeString =
