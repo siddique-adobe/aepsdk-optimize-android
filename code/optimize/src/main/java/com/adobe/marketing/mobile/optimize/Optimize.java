@@ -13,7 +13,6 @@ package com.adobe.marketing.mobile.optimize;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.AdobeCallbackWithError;
 import com.adobe.marketing.mobile.AdobeError;
@@ -121,8 +120,7 @@ public class Optimize {
         updatePropositionsInternal(decisionScopes, xdm, data, timeoutSeconds, callback);
     }
 
-    @VisibleForTesting
-    static void updatePropositionsInternal(
+    private static void updatePropositionsInternal(
             @NonNull final List<DecisionScope> decisionScopes,
             @Nullable final Map<String, Object> xdm,
             @Nullable final Map<String, Object> data,
@@ -300,8 +298,7 @@ public class Optimize {
         getPropositionsInternal(decisionScopes, timeoutSeconds, callback);
     }
 
-    @VisibleForTesting
-    static void getPropositionsInternal(
+    private static void getPropositionsInternal(
             @NonNull final List<DecisionScope> decisionScopes,
             final double timeoutSeconds,
             @NonNull final AdobeCallback<Map<DecisionScope, OptimizeProposition>> callback) {

@@ -18,7 +18,7 @@ class OptimizeConstants {
     static final String FRIENDLY_NAME = "Optimize";
     static final double GET_RESPONSE_CALLBACK_TIMEOUT = 10;
     static final double EDGE_CONTENT_COMPLETE_RESPONSE_TIMEOUT = 10;
-    static final double DEFAULT_CONFIGURABLE_TIMEOUT_CONFIG = 10;
+    static final double UPDATE_RESPONSE_DEFAULT_TIMEOUT = 10;
     static final long TIMEOUT_CONVERSION_FACTOR = 1000;
 
     static final String ACTIVITY_ID = "activityId";

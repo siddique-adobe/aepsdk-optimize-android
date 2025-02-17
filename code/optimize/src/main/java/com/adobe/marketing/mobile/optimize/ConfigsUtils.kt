@@ -37,19 +37,12 @@ object ConfigsUtils {
 
     @JvmStatic
     fun Event.retrieveOptimizeRequestTimeout(configData: Map<String, Any?>): Long {
-        val defaultTimeout = OptimizeConstants.DEFAULT_CONFIGURABLE_TIMEOUT_CONFIG.toLong()
-
+        val defaultTimeout = OptimizeConstants.UPDATE_RESPONSE_DEFAULT_TIMEOUT.toLong()
         return try {
-            val timeout = eventData?.takeIf {
-                it.containsKey(OptimizeConstants.EventDataKeys.TIMEOUT)
-            }?.let {
-                DataReader.getLong(it, OptimizeConstants.EventDataKeys.TIMEOUT)
-            } ?: return defaultTimeout
-
-            if (timeout == Long.MAX_VALUE) DataReader.getLong(
-                configData,
-                OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT
-            ) else timeout
+            val eventTimeout = DataReader.getLong(eventData, OptimizeConstants.EventDataKeys.TIMEOUT)
+            if (eventTimeout == Long.MAX_VALUE)
+                DataReader.getLong(configData, OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT)
+             else eventTimeout
         } catch (e: DataReaderException) {
             defaultTimeout
         }

@@ -82,7 +82,7 @@ public class OptimizeTests {
                     new DecisionScope(
                             "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ=="));
 
-            Optimize.updatePropositionsInternal(scopes, null, null, 10.0, null);
+            Optimize.updatePropositions(scopes, null, null);
 
             // verify
 
@@ -144,11 +144,10 @@ public class OptimizeTests {
                     new DecisionScope(
                             "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ=="));
 
-            Optimize.updatePropositionsInternal(
+            Optimize.updatePropositions(
                     scopes,
                     null,
                     null,
-                    10.0,
                     new AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>>() {
                         @Override
                         public void fail(AdobeError adobeError) {
@@ -247,7 +246,7 @@ public class OptimizeTests {
                     new DecisionScope(
                             "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ=="));
 
-            Optimize.updatePropositionsInternal(
+            Optimize.updatePropositions(
                     scopes,
                     new HashMap<String, Object>() {
                         {
@@ -258,9 +257,7 @@ public class OptimizeTests {
                         {
                             put("myKey", "myValue");
                         }
-                    },
-                    10.0,
-                    null);
+                    });
 
             final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
             final ArgumentCaptor<AdobeCallbackWithError<Event>> callbackCaptor =
@@ -329,7 +326,7 @@ public class OptimizeTests {
                             "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ=="));
             scopes.add(new DecisionScope("myMbox"));
 
-            Optimize.updatePropositionsInternal(scopes, null, null, 10.0, null);
+            Optimize.updatePropositions(scopes, null, null);
 
             final ArgumentCaptor<Event> eventCaptor = ArgumentCaptor.forClass(Event.class);
             final ArgumentCaptor<AdobeCallbackWithError<Event>> callbackCaptor =
@@ -374,8 +371,7 @@ public class OptimizeTests {
     public void testUpdatePropositions_emptyDecisionScopesList() {
         try (MockedStatic<Log> logMockedStatic = Mockito.mockStatic(Log.class)) {
             // test
-            Optimize.updatePropositionsInternal(
-                    new ArrayList<DecisionScope>(), null, null, 10.0, null);
+            Optimize.updatePropositions(new ArrayList<DecisionScope>(), null, null);
 
             // verify
             logMockedStatic.verify(
@@ -391,7 +387,7 @@ public class OptimizeTests {
     public void testUpdatePropositions_nullDecisionScopesList() {
         try (MockedStatic<Log> logMockedStatic = Mockito.mockStatic(Log.class)) {
             // test
-            Optimize.updatePropositionsInternal(null, null, null, 10.0, null);
+            Optimize.updatePropositions(null, null, null);
 
             // verify
             logMockedStatic.verify(
@@ -425,7 +421,7 @@ public class OptimizeTests {
                     new DecisionScope(
                             "eyJhY3Rpdml0eUlkIjoiIiwicGxhY2VtZW50SWQiOiJ4Y29yZTpvZmZlci1wbGFjZW1lbnQ6MTExMTExMTExMTExMTExMSJ9"));
 
-            Optimize.updatePropositionsInternal(scopes, null, null, 10.0, null);
+            Optimize.updatePropositions(scopes, null, null);
 
             // verify
             logMockedStatic.verify(
@@ -461,9 +457,8 @@ public class OptimizeTests {
                     new DecisionScope(
                             "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ=="));
 
-            Optimize.getPropositionsInternal(
+            Optimize.getPropositions(
                     scopes,
-                    10.0,
                     new AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>>() {
                         @Override
                         public void fail(AdobeError adobeError) {
@@ -569,9 +564,8 @@ public class OptimizeTests {
                             "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ=="));
             scopes.add(new DecisionScope("myMbox"));
 
-            Optimize.getPropositionsInternal(
+            Optimize.getPropositions(
                     scopes,
-                    10.0,
                     new AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>>() {
                         @Override
                         public void fail(AdobeError adobeError) {
@@ -640,9 +634,8 @@ public class OptimizeTests {
                     new DecisionScope(
                             "eyJhY3Rpdml0eUlkIjoiIiwicGxhY2VtZW50SWQiOiJ4Y29yZTpvZmZlci1wbGFjZW1lbnQ6MTExMTExMTExMTExMTExMSJ9"));
 
-            Optimize.getPropositionsInternal(
+            Optimize.getPropositions(
                     scopes,
-                    10.0,
                     new AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>>() {
                         @Override
                         public void fail(AdobeError adobeError) {
@@ -670,9 +663,8 @@ public class OptimizeTests {
     public void testGetPropositions_emptyDecisionScopesList() {
         try (MockedStatic<Log> logMockedStatic = Mockito.mockStatic(Log.class)) {
             // test
-            Optimize.getPropositionsInternal(
+            Optimize.getPropositions(
                     new ArrayList<DecisionScope>(),
-                    10.0,
                     new AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>>() {
                         @Override
                         public void fail(AdobeError adobeError) {
@@ -700,9 +692,8 @@ public class OptimizeTests {
     public void testGetPropositions_nullDecisionScopesList() {
         try (MockedStatic<Log> logMockedStatic = Mockito.mockStatic(Log.class)) {
             // test
-            Optimize.getPropositionsInternal(
+            Optimize.getPropositions(
                     null,
-                    10.0,
                     new AdobeCallbackWithError<Map<DecisionScope, OptimizeProposition>>() {
                         @Override
                         public void fail(AdobeError adobeError) {
@@ -959,7 +950,7 @@ public class OptimizeTests {
                                         return null;
                                     });
 
-            Optimize.updatePropositionsInternal(scopes, xdm, data, timeoutSeconds, callbackMock);
+            Optimize.updatePropositions(scopes, xdm, data, timeoutSeconds, callbackMock);
             ArgumentCaptor<AEPOptimizeError> errorCaptor =
                     ArgumentCaptor.forClass(AEPOptimizeError.class);
             verify(callbackMockEvent, times(1)).fail(errorCaptor.capture());
@@ -1016,7 +1007,7 @@ public class OptimizeTests {
                                         return null;
                                     });
 
-            Optimize.getPropositionsInternal(scopes, timeoutSeconds, callbackMock);
+            Optimize.getPropositions(scopes, timeoutSeconds, callbackMock);
             ArgumentCaptor<AEPOptimizeError> errorCaptor =
                     ArgumentCaptor.forClass(AEPOptimizeError.class);
             verify(callbackMockEvent, times(1)).fail(errorCaptor.capture());
