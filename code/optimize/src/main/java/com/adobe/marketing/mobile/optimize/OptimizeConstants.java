@@ -13,7 +13,7 @@ package com.adobe.marketing.mobile.optimize;
 
 class OptimizeConstants {
     static final String LOG_TAG = "Optimize";
-    static final String EXTENSION_VERSION = "3.2.4";
+    static final String EXTENSION_VERSION = "3.3.0";
     static final String EXTENSION_NAME = "com.adobe.optimize";
     static final String FRIENDLY_NAME = "Optimize";
     static final double GET_RESPONSE_CALLBACK_TIMEOUT = 10;
@@ -98,6 +98,9 @@ class OptimizeConstants {
         static final String EVENT_HANDLE = "type";
         static final String EVENT_HANDLE_TYPE_PERSONALIZATION = "personalization:decisions";
         static final String PAYLOAD = "payload";
+        static final String DEBUG = "debug";
+        static final String EVENT_SOURCE = "eventSource";
+        static final String EVENT_TYPE = "eventType";
 
         static final class ErrorKeys {
             static final String TYPE = "type";
