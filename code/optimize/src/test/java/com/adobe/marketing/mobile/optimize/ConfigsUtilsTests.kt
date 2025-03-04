@@ -50,7 +50,7 @@ class ConfigsUtilsTests {
     fun `returns timeout from configData when eventData contains Long_MAX_VALUE`() {
         val eventData = mapOf(OptimizeConstants.EventDataKeys.TIMEOUT to Long.MAX_VALUE)
         val configData =
-            mapOf<String, Any?>(OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT to 7)
+            mapOf<String, Any?>(OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT to 7000)
         every { mockEvent.eventData } returns eventData
 
         Assert.assertEquals(7000L, mockEvent.retrieveOptimizeRequestTimeout(configData))
