@@ -15,7 +15,7 @@ import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.util.DataReader
 import com.adobe.marketing.mobile.util.DataReaderException
 
-object ConfigsUtils {
+internal object ConfigsUtils {
     @JvmStatic
     fun Event.retrieveOptimizeRequestTimeout(configData: Map<String, Any?>): Long {
         val defaultTimeout =
