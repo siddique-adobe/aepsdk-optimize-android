@@ -1,9 +1,19 @@
 package com.adobe.marketing.optimizeapp.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.RadioButton
+import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,21 +41,21 @@ fun TimeoutConfigsCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .padding(18.dp)
         ) {
             Text(
-                text = "Configure GET & UPDATE request timeout",
+                text = "GET & UPDATE propositions request timeout",
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 color = Color.Black,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(vertical = 12.dp)
             )
-
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    Spacer(modifier = Modifier.width(8.dp))
                     RadioButton(
                         selected = !data.isCustomTimeoutOpted,
                         onClick = { onOptionSelected(false) }
@@ -57,6 +67,7 @@ fun TimeoutConfigsCard(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    Spacer(modifier = Modifier.width(8.dp))
                     RadioButton(
                         selected = data.isCustomTimeoutOpted,
                         onClick = { onOptionSelected(true) }
@@ -66,6 +77,7 @@ fun TimeoutConfigsCard(
                     if (data.isCustomTimeoutOpted) {
                         Spacer(modifier = Modifier.width(8.dp))
                         TextField(
+                            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp),
                             value = data.value,
                             onValueChange = { newValue ->
                                 if (newValue.toDoubleOrNull() != null || newValue.isEmpty()) {
@@ -94,8 +106,8 @@ fun PreviewTextFieldWithRadio() {
         TimeoutConfigsCardData(
             value = "30",
             isCustomTimeoutOpted = true,
-            pref1Txt = "Use default timeout",
-            pref2Txt = "Use custom timeout"
+            pref1Txt = "Default timeout | Config timeout",
+            pref2Txt = "Custom timeout"
         )
     )
 }

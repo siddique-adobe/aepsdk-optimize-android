@@ -59,8 +59,8 @@ class MainViewModel : ViewModel() {
     private val _mutableTimeoutConfig = mutableStateOf(
         TimeoutConfigsCardData(
             "10.0",
-            pref1Txt = "Use default timeout",
-            pref2Txt = "Use custom timeout (in seconds)",
+            pref1Txt = "Default timeout | Config timeout",
+            pref2Txt = "Custom timeout (in seconds)",
             isCustomTimeoutOpted = false
         )
     )
