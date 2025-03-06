@@ -24,7 +24,7 @@ object ConfigsUtils {
         return try {
             val eventTimeout = DataReader.getLong(eventData, OptimizeConstants.EventDataKeys.TIMEOUT)
             if (eventTimeout == Long.MAX_VALUE)
-                DataReader.getLong(configData, OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT)
+                DataReader.getLong(configData, OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT).times(OptimizeConstants.TIMEOUT_CONVERSION_FACTOR)
             else eventTimeout
         } catch (e: DataReaderException) {
             defaultTimeout
