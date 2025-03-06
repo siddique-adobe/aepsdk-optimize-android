@@ -12,7 +12,7 @@
 package com.adobe.marketing.mobile.optimize
 
 import com.adobe.marketing.mobile.Event
-import com.adobe.marketing.mobile.optimize.ConfigsUtils.retrieveOptimizeRequestTimeout
+import com.adobe.marketing.mobile.optimize.ConfigUtils.retrieveOptimizeRequestTimeout
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
@@ -20,7 +20,7 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Test
 
-class ConfigsUtilsTests {
+class ConfigUtilsTests {
 
     private val mockEvent: Event = mockk<Event>(relaxed = true)
 
@@ -34,7 +34,7 @@ class ConfigsUtilsTests {
         every { mockEvent.eventData } returns null
         val configData = mapOf<String, Any?>()
 
-        Assert.assertEquals(10000, mockEvent.retrieveOptimizeRequestTimeout(configData))
+        Assert.assertEquals(10000, retrieveOptimizeRequestTimeout(mockEvent, configData))
     }
 
     @Test
@@ -43,7 +43,7 @@ class ConfigsUtilsTests {
         every { mockEvent.eventData } returns eventData
         val configData = mapOf<String, Any?>()
 
-        Assert.assertEquals(3000L, mockEvent.retrieveOptimizeRequestTimeout(configData))
+        Assert.assertEquals(3000L, retrieveOptimizeRequestTimeout(mockEvent, configData))
     }
 
     @Test
@@ -53,7 +53,7 @@ class ConfigsUtilsTests {
             mapOf<String, Any?>(OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT to 7)
         every { mockEvent.eventData } returns eventData
 
-        Assert.assertEquals(7000L, mockEvent.retrieveOptimizeRequestTimeout(configData))
+        Assert.assertEquals(7000L, retrieveOptimizeRequestTimeout(mockEvent, configData))
     }
 
     @Test
@@ -62,7 +62,7 @@ class ConfigsUtilsTests {
         val configData = mapOf<String, Any?>()
         every { mockEvent.eventData } returns eventData
 
-        Assert.assertEquals(10000, mockEvent.retrieveOptimizeRequestTimeout(configData))
+        Assert.assertEquals(10000, retrieveOptimizeRequestTimeout(mockEvent, configData))
     }
 
     @Test
@@ -72,7 +72,7 @@ class ConfigsUtilsTests {
             mapOf<String, Any?>(OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT to 7)
         every { mockEvent.eventData } returns eventData
 
-        Assert.assertEquals(10000, mockEvent.retrieveOptimizeRequestTimeout(configData))
+        Assert.assertEquals(10000, retrieveOptimizeRequestTimeout(mockEvent, configData))
     }
 
     @Test
@@ -82,6 +82,6 @@ class ConfigsUtilsTests {
             mapOf<String, Any?>(OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT to "invalid_value")
         every { mockEvent.eventData } returns eventData
 
-        Assert.assertEquals(10000, mockEvent.retrieveOptimizeRequestTimeout(configData))
+        Assert.assertEquals(10000, retrieveOptimizeRequestTimeout(mockEvent, configData))
     }
 }
