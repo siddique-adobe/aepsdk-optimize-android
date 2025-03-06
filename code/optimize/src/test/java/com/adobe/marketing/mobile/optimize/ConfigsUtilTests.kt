@@ -12,7 +12,7 @@
 package com.adobe.marketing.mobile.optimize
 
 import com.adobe.marketing.mobile.Event
-import com.adobe.marketing.mobile.optimize.ConfigsUtils.retrieveOptimizeRequestTimeout
+import com.adobe.marketing.mobile.optimize.ConfigsUtil.retrieveOptimizeRequestTimeout
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.unmockkAll
@@ -20,7 +20,7 @@ import org.junit.After
 import org.junit.Assert
 import org.junit.Test
 
-class ConfigsUtilsTests {
+class ConfigsUtilTests {
 
     private val mockEvent: Event = mockk<Event>(relaxed = true)
 

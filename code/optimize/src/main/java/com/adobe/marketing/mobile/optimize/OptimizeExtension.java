@@ -460,7 +460,7 @@ class OptimizeExtension extends Extension {
 
             // add the Edge event to update propositions in the events queue.
             eventsDispatcher.offer(edgeEvent);
-            long timeoutMillis = ConfigsUtils.retrieveOptimizeRequestTimeout(event, configData);
+            long timeoutMillis = ConfigsUtil.retrieveOptimizeRequestTimeout(event, configData);
             MobileCore.dispatchEventWithResponseCallback(
                     edgeEvent,
                     timeoutMillis,
