@@ -17,14 +17,16 @@ import com.adobe.marketing.mobile.util.DataReaderException
 
 internal object ConfigsUtils {
     @JvmStatic
-    fun Event.retrieveOptimizeRequestTimeout(configData: Map<String, Any?>): Long {
+    fun retrieveOptimizeRequestTimeout(event: Event, configData: Map<String, Any?>): Long {
         val defaultTimeout =
             OptimizeConstants.UPDATE_RESPONSE_DEFAULT_TIMEOUT.times(OptimizeConstants.TIMEOUT_CONVERSION_FACTOR)
                 .toLong()
         return try {
-            val eventTimeout = DataReader.getLong(eventData, OptimizeConstants.EventDataKeys.TIMEOUT)
+            val eventTimeout =
+                DataReader.getLong(event.eventData, OptimizeConstants.EventDataKeys.TIMEOUT)
             if (eventTimeout == Long.MAX_VALUE)
-                DataReader.getLong(configData, OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT).times(OptimizeConstants.TIMEOUT_CONVERSION_FACTOR)
+                DataReader.getLong(configData, OptimizeConstants.EventDataKeys.CONFIGS_TIMEOUT)
+                    .times(OptimizeConstants.TIMEOUT_CONVERSION_FACTOR)
             else eventTimeout
         } catch (e: DataReaderException) {
             defaultTimeout
