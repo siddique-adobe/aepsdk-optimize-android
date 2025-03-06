@@ -13,11 +13,12 @@ package com.adobe.marketing.mobile.optimize;
 
 class OptimizeConstants {
     static final String LOG_TAG = "Optimize";
-    static final String EXTENSION_VERSION = "3.3.0";
+    static final String EXTENSION_VERSION = "3.4.0";
     static final String EXTENSION_NAME = "com.adobe.optimize";
     static final String FRIENDLY_NAME = "Optimize";
     static final double GET_RESPONSE_CALLBACK_TIMEOUT = 10;
     static final double EDGE_CONTENT_COMPLETE_RESPONSE_TIMEOUT = 10;
+    static final double UPDATE_RESPONSE_DEFAULT_TIMEOUT = 10;
     static final long TIMEOUT_CONVERSION_FACTOR = 1000;
 
     static final String ACTIVITY_ID = "activityId";
@@ -76,6 +77,7 @@ class OptimizeConstants {
         static final String XDM = "xdm";
         static final String DATA = "data";
         static final String TIMEOUT = "timeout";
+        static final String CONFIGS_TIMEOUT = "optimize.timeout";
         static final String PROPOSITIONS = "propositions";
         static final String RESPONSE_ERROR = "responseerror";
         static final String PROPOSITION_INTERACTIONS = "propositioninteractions";
