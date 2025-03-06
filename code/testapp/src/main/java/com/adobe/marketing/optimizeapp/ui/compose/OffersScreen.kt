@@ -16,7 +16,6 @@ import android.webkit.WebView
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -59,11 +58,8 @@ private val displayHandler: (Offer) -> Unit = { offer ->
 @Composable
 fun OffersView(viewModel: MainViewModel) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
     Column(
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth()
+        modifier = Modifier.fillMaxSize()
     ) {
 
         Box(modifier = Modifier.weight(1f)) {
@@ -73,7 +69,7 @@ fun OffersView(viewModel: MainViewModel) {
                 OffersList(viewModel = viewModel)
             }
 
-            if(viewModel.showLogs.value.not()) {
+            if (viewModel.showLogs.value.not()) {
                 IconButton(
                     modifier = Modifier
                         .padding(8.dp)
@@ -111,7 +107,7 @@ fun OffersView(viewModel: MainViewModel) {
                 .background(color = Color.Gray)
         )
 
-        if(viewModel.showLogs.value) {
+        if (viewModel.showLogs.value) {
             LogBox(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -198,49 +194,56 @@ fun OffersList(
         items(
             items = viewModel.optimizePropositionStateMap.keys.toList().sorted(),
             key = { item -> item },
-            itemContent = { item ->
-                when (item) {
+            itemContent = { offerType ->
+                when (offerType) {
                     viewModel.textOdeText -> {
                         OffersSectionText(sectionName = "Text Offers")
                         TextOffers(
-                            offers = viewModel.optimizePropositionStateMap[viewModel.textOdeText]?.offers,
-                            listState = listState
+                            offers = viewModel.optimizePropositionStateMap[viewModel.textOdeText]?.offers
                         )
                     }
 
                     viewModel.textOdeImage -> {
                         OffersSectionText(sectionName = "Image Offers")
-                        ImageOffers(
-                            offers = viewModel.optimizePropositionStateMap[viewModel.textOdeImage]?.offers,
-                            listState = listState
-                        )
+                        ImageOffers(viewModel.optimizePropositionStateMap[viewModel.textOdeImage]?.offers)
                     }
 
                     viewModel.textOdeHtml -> {
                         OffersSectionText(sectionName = "HTML Offers")
-                        HTMLOffers(
-                            offers = viewModel.optimizePropositionStateMap[viewModel.textOdeHtml]?.offers,
-                            listState = listState
-                        )
+                        HTMLOffers(viewModel.optimizePropositionStateMap[viewModel.textOdeHtml]?.offers)
                     }
 
                     viewModel.textOdeJson -> {
                         OffersSectionText(sectionName = "JSON Offers")
-                        JSONOffers(
-                            offers = viewModel.optimizePropositionStateMap[viewModel.textOdeJson]?.offers,
-                            listState = listState
-                        )
+                        JSONOffers(viewModel.optimizePropositionStateMap[viewModel.textOdeJson]?.offers)
                     }
 
                     viewModel.textTargetMbox -> {
                         OffersSectionText(sectionName = "Target Offers")
-                        TargetOffersView(
-                            offers = viewModel.optimizePropositionStateMap[viewModel.textTargetMbox]?.offers,
-                            listState = listState
-                        )
+                        TargetOffersView(viewModel.optimizePropositionStateMap[viewModel.textTargetMbox]?.offers)
+                    }
+
+                    else -> {}
+                }.also {
+                    val propositions = viewModel.optimizePropositionStateMap[offerType]
+                    listState.also {
+                        LaunchedEffect(it) {
+                            snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
+                                .map { visibleItemKeys ->
+                                    visibleItemKeys.contains(
+                                        propositions?.offers?.get(0)?.proposition?.scope ?: ""
+                                    )
+                                }
+                                .distinctUntilChanged()
+                                .filter { result -> result }
+                                .collect {
+                                    propositions?.offers?.forEach(displayHandler)
+                                }
+                        }
                     }
                 }
-            })
+            }
+        )
     }
 }
 
@@ -282,8 +285,7 @@ fun OffersSectionText(sectionName: String) {
 @Composable
 fun TextOffers(
     offers: List<Offer>? = null,
-    placeholder: String = "Placeholder Text",
-    listState: LazyListState? = null
+    placeholder: String = "Placeholder Text"
 ) {
 
     offers?.let { offersList ->
@@ -299,29 +301,12 @@ fun TextOffers(
         style = MaterialTheme.typography.body1,
         textAlign = TextAlign.Center
     )
-
-    listState?.also {
-        LaunchedEffect(it) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys ->
-                    visibleItemKeys.contains(
-                        offers?.get(0)?.proposition?.scope ?: ""
-                    )
-                }
-                .distinctUntilChanged()
-                .filter { result -> result }
-                .collect {
-                    offers?.forEach(displayHandler)
-                }
-        }
-    }
 }
 
 @Composable
 fun JSONOffers(
     offers: List<Offer>? = null,
-    placeholder: String = """{"placeholder": true}""",
-    listState: LazyListState? = null
+    placeholder: String = """{"placeholder": true}"""
 ) {
 
     offers?.let { offersList ->
@@ -337,22 +322,6 @@ fun JSONOffers(
         style = MaterialTheme.typography.body1,
         textAlign = TextAlign.Center
     )
-
-    listState?.also {
-        LaunchedEffect(it) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys ->
-                    visibleItemKeys.contains(
-                        offers?.get(0)?.proposition?.scope ?: ""
-                    )
-                }
-                .distinctUntilChanged()
-                .filter { result -> result }
-                .collect {
-                    offers?.forEach(displayHandler)
-                }
-        }
-    }
 }
 
 @Composable
@@ -373,7 +342,7 @@ fun TextOffer(offer: Offer) {
 
 @OptIn(ExperimentalCoilApi::class)
 @Composable
-fun ImageOffers(offers: List<Offer>? = null, listState: LazyListState? = null) {
+fun ImageOffers(offers: List<Offer>? = null) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -402,29 +371,12 @@ fun ImageOffers(offers: List<Offer>? = null, listState: LazyListState? = null) {
                 .height(100.dp)
         )
     }
-
-    listState?.also {
-        LaunchedEffect(it) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys ->
-                    visibleItemKeys.contains(
-                        offers?.get(0)?.proposition?.scope ?: ""
-                    )
-                }
-                .distinctUntilChanged()
-                .filter { result -> result }
-                .collect {
-                    offers?.forEach(displayHandler)
-                }
-        }
-    }
 }
 
 @Composable
 fun HTMLOffers(
     offers: List<Offer>? = null,
     placeholderHtml: String = "<html><body><p style=\"color:green; font-size:20px;position: absolute;top: 50%;left: 50%;margin-right: -50%;transform: translate(-50%, -50%)\">Placeholder Html</p></body></html>",
-    listState: LazyListState? = null
 ) {
     Column(
         modifier = Modifier
@@ -439,22 +391,6 @@ fun HTMLOffers(
             }
             )
         } ?: HtmlOfferWebView(html = placeholderHtml)
-    }
-
-    listState?.also {
-        LaunchedEffect(it) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys ->
-                    visibleItemKeys.contains(
-                        offers?.get(0)?.proposition?.scope ?: ""
-                    )
-                }
-                .distinctUntilChanged()
-                .filter { result -> result }
-                .collect {
-                    offers?.forEach(displayHandler)
-                }
-        }
     }
 }
 
@@ -482,7 +418,7 @@ fun HtmlOfferWebView(html: String, onclick: (() -> Unit)? = null) {
 }
 
 @Composable
-fun TargetOffersView(offers: List<Offer>? = null, listState: LazyListState? = null) {
+fun TargetOffersView(offers: List<Offer>? = null) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -494,29 +430,14 @@ fun TargetOffersView(offers: List<Offer>? = null, listState: LazyListState? = nu
                     html = it.content,
                     onclick = { clickHandler(it) })
 
-                else -> Text(text = it.content, modifier = Modifier
-                    .padding(vertical = 20.dp)
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .clickable { clickHandler(it) }, textAlign = TextAlign.Center
+                else -> Text(
+                    text = it.content, modifier = Modifier
+                        .padding(vertical = 20.dp)
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .clickable { clickHandler(it) }, textAlign = TextAlign.Center
                 )
             }
         } ?: TextOffers(offers = null, placeholder = "Placeholder Target Text")
-    }
-
-    listState?.also {
-        LaunchedEffect(it) {
-            snapshotFlow { listState.layoutInfo.visibleItemsInfo.map { lazyListItemInfo -> lazyListItemInfo.key } }
-                .map { visibleItemKeys ->
-                    visibleItemKeys.contains(
-                        offers?.get(0)?.proposition?.scope ?: ""
-                    )
-                }
-                .distinctUntilChanged()
-                .filter { result -> result }
-                .collect {
-                    offers?.forEach(displayHandler)
-                }
-        }
     }
 }
