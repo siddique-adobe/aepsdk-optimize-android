@@ -12,6 +12,15 @@
 package com.adobe.marketing.mobile.optimize
 
 object OfferUtils {
+    /**
+     * Dispatches an event for the Edge network extension to send an Experience Event to the Edge
+     * network with the display interaction data for the given list of [Offer]s.
+     *
+     * This function extracts unique [OptimizeProposition]s from the list of offers based on their
+     * proposition ID and dispatches an event with multiple propositions.
+     *
+     * @see XDMUtils.trackWithData
+     */
     fun List<Offer>.displayed() {
         val uniquePropositions = map { it.proposition }.distinctBy { it.id }
         XDMUtils.trackWithData(

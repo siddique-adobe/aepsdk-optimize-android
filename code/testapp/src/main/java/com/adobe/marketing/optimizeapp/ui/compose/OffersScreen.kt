@@ -13,12 +13,28 @@ package com.adobe.marketing.optimizeapp.ui.compose
 
 import android.view.ViewGroup
 import android.webkit.WebView
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.absolutePadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -41,7 +57,6 @@ import coil.annotation.ExperimentalCoilApi
 import coil.compose.rememberImagePainter
 import com.adobe.marketing.mobile.optimize.Offer
 import com.adobe.marketing.mobile.optimize.OfferType
-import com.adobe.marketing.mobile.optimize.OfferUtils.displayed
 import com.adobe.marketing.optimizeapp.R
 import com.adobe.marketing.optimizeapp.viewmodels.MainViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -50,14 +65,6 @@ import kotlinx.coroutines.flow.map
 
 private val clickHandler: (Offer) -> Unit = { offer ->
     offer.tapped()
-}
-
-private val displayOfferHandler: (Offer) -> Unit = { offer ->
-    offer.displayed()
-}
-
-private val displayPropositionsHandler: (List<Offer>) -> Unit = { offers ->
-    offers.displayed()
 }
 
 @Composable
