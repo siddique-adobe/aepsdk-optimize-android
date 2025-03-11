@@ -249,7 +249,9 @@ fun OffersList(
                                 .distinctUntilChanged()
                                 .filter { result -> result }
                                 .collect {
-                                    propositions?.offers?.forEach(displayHandler)
+                                    propositions?.offers?.let { offers ->
+                                        viewModel.onOfferDisplayed(offers)
+                                    }
                                 }
                         }
                     }
