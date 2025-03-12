@@ -19,8 +19,8 @@ import org.junit.Before
 import kotlin.test.Test
 
 class XDMUtilsTest {
-    private lateinit var singleProposition: XDMUtils.InteractionPropositionType.SingleProposition
-    private lateinit var multiplePropositions: XDMUtils.InteractionPropositionType.MultiplePropositions
+    private lateinit var singleProposition: OptimizeProposition
+    private lateinit var multiplePropositions: List<OptimizeProposition>
 
     private fun validateStructure(expectedStructure: Any, actual: Any): Boolean {
         return when {
@@ -50,12 +50,8 @@ class XDMUtilsTest {
             loadJsonFromFile("json/MULTIPLE_PROPOSITION_VALID_TARGET.json") ?: emptyList()
         val singlePropositionMap: Map<String, Any> =
             loadJsonFromFile("json/PROPOSITION_VALID_TARGET.json") ?: emptyMap()
-        singleProposition = XDMUtils.InteractionPropositionType.SingleProposition(
-            OptimizeProposition.fromEventData(singlePropositionMap), "246315"
-        )
-        multiplePropositions = XDMUtils.InteractionPropositionType.MultiplePropositions(
-            multipleItemsList.map { OptimizeProposition.fromEventData(it) }
-        )
+        singleProposition = OptimizeProposition.fromEventData(singlePropositionMap)
+        multiplePropositions = multipleItemsList.map { OptimizeProposition.fromEventData(it) }
     }
 
     @After
@@ -66,7 +62,7 @@ class XDMUtilsTest {
     @Test
     fun `generateInteractionXdm should return correct structure for SingleProposition`() {
         val experienceEventType = "decisioning.propositionDisplay"
-        val result = XDMUtils.generateInteractionXdm(experienceEventType, singleProposition)
+        val result = XDMUtils.generateInteractionXdm(experienceEventType, listOf(singleProposition))
 
         val expectedStructure = mapOf(
             "_experience" to mapOf(
@@ -123,14 +119,14 @@ class XDMUtilsTest {
             propositions["propositions"] as List<Map<String, Any>>
 
         decisioningPropositions.forEach { proposition ->
-            Assert.assertTrue(!proposition.containsKey("items"))
+            Assert.assertTrue(proposition.containsKey("items"))
         }
     }
 
     @Test
     fun `generateInteractionXdm should contain exactly one item in items array for SingleProposition`() {
         val experienceEventType = "decisioning.propositionDisplay"
-        val result = XDMUtils.generateInteractionXdm(experienceEventType, singleProposition)
+        val result = XDMUtils.generateInteractionXdm(experienceEventType, listOf(singleProposition))
 
         val propositions =
             (result["_experience"] as Map<*, *>)["decisioning"] as Map<*, *>

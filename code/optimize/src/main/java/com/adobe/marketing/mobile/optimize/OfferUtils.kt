@@ -22,11 +22,26 @@ object OfferUtils {
      * @see XDMUtils.trackWithData
      */
     fun List<Offer>.displayed() {
-        val uniquePropositions = map { it.proposition }.distinctBy { it.id }
+        if (isEmpty()) return
+        val offerIds = mapTo(mutableSetOf()) { it.id }
+
+        val uniquePropositions = map { it.proposition }
+            .distinctBy { it.id }
+            .mapNotNull { proposition ->
+                val displayedOffers = proposition.offers.filter { it.id in offerIds }
+                if (displayedOffers.isNotEmpty()) {
+                    OptimizeProposition(
+                        proposition.id,
+                        displayedOffers,
+                        proposition.scope,
+                        proposition.scopeDetails
+                    )
+                } else null
+            }
+        if (uniquePropositions.isEmpty()) return
         XDMUtils.trackWithData(
             XDMUtils.generateInteractionXdm(
-                OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
-                XDMUtils.InteractionPropositionType.MultiplePropositions(uniquePropositions)
+                OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY, uniquePropositions
             )
         )
     }

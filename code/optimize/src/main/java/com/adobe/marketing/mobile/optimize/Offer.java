@@ -16,6 +16,7 @@ import com.adobe.marketing.mobile.util.DataReader;
 import com.adobe.marketing.mobile.util.DataReaderException;
 import java.lang.ref.SoftReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -304,16 +305,21 @@ public class Offer {
      * along with any additional XDM, free-form data, and override dataset identifier.
      *
      * @return {@code Map<String, Object>} containing the XDM data for the proposition interaction.
-     * @see XDMUtils#generateInteractionXdm(String, XDMUtils.InteractionPropositionType)
+     * @see XDMUtils#generateInteractionXdm(String, List)
      */
     public Map<String, Object> generateDisplayInteractionXdm() {
         if (propositionReference == null || propositionReference.get() == null) {
             return null;
         }
+        OptimizeProposition proposition =
+                new OptimizeProposition(
+                        propositionReference.get().getId(),
+                        Collections.singletonList(this),
+                        propositionReference.get().getScope(),
+                        propositionReference.get().getScopeDetails());
         return XDMUtils.generateInteractionXdm(
                 OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
-                new XDMUtils.InteractionPropositionType.SingleProposition(
-                        propositionReference.get(), id));
+                Collections.singletonList(proposition));
     }
 
     /**
@@ -327,16 +333,21 @@ public class Offer {
      * along with any additional XDM, free-form data, and override dataset identifier.
      *
      * @return {@code Map<String, Object>} containing the XDM data for the proposition interaction.
-     * @see XDMUtils#generateInteractionXdm(String, XDMUtils.InteractionPropositionType)
+     * @see XDMUtils#generateInteractionXdm(String, List)
      */
     public Map<String, Object> generateTapInteractionXdm() {
         if (propositionReference == null || propositionReference.get() == null) {
             return null;
         }
+        OptimizeProposition proposition =
+                new OptimizeProposition(
+                        propositionReference.get().getId(),
+                        Collections.singletonList(this),
+                        propositionReference.get().getScope(),
+                        propositionReference.get().getScopeDetails());
         return XDMUtils.generateInteractionXdm(
                 OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_INTERACT,
-                new XDMUtils.InteractionPropositionType.SingleProposition(
-                        propositionReference.get(), id));
+                Collections.singletonList(proposition));
     }
 
     /**

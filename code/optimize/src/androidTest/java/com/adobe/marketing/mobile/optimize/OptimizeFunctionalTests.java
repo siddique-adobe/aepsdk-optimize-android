@@ -2696,8 +2696,7 @@ public class OptimizeFunctionalTests {
         XDMUtils.trackWithData(
                 XDMUtils.generateInteractionXdm(
                         OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
-                        new XDMUtils.InteractionPropositionType.MultiplePropositions(
-                                optimizePropositionList)));
+                        optimizePropositionList));
 
         List<Event> optimizeRequestEventsList =
                 TestHelper.getDispatchedEventsWith(
@@ -2737,7 +2736,7 @@ public class OptimizeFunctionalTests {
 
         List<Map<String, Object>> itemsList1 =
                 (List<Map<String, Object>>) propositionMap1.get("items");
-        Assert.assertNull(itemsList1);
+        Assert.assertNotNull(itemsList1);
 
         Map<String, Object> propositionMap2 = propositionList.get(1);
         Assert.assertEquals(
@@ -2748,7 +2747,7 @@ public class OptimizeFunctionalTests {
 
         List<Map<String, Object>> itemsList2 =
                 (List<Map<String, Object>>) propositionMap2.get("items");
-        Assert.assertNull(itemsList2);
+        Assert.assertNotNull(itemsList2);
     }
 
     private void updateConfiguration(final Map<String, Object> config) throws InterruptedException {
