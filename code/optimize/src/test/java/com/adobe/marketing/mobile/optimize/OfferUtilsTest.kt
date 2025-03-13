@@ -76,8 +76,19 @@ class OfferUtilsTest {
                 ?.get("decisioning") as? Map<String, Any>
             )?.get("propositions") as? List<Map<String, Any>>
 
+        val offers = rawPropositions?.flatMap { proposition ->
+            (proposition["items"] as? List<Map<String, Any>>).orEmpty()
+        }
+
         assertNotNull(rawPropositions)
         assertEquals(1, rawPropositions.size)
+        assertEquals(
+            "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ8",
+            rawPropositions.first()["id"] as? String
+        )
+        assertNotNull(offers)
+        assertEquals(1, offers.size)
+        assertEquals("246314", offers.first()["id"] as? String)
     }
 
     @Test
@@ -95,8 +106,16 @@ class OfferUtilsTest {
                 ?.get("decisioning") as? Map<String, Any>
             )?.get("propositions") as? List<Map<String, Any>>
 
+        val offers = rawPropositions?.flatMap { proposition ->
+            (proposition["items"] as? List<Map<String, Any>>).orEmpty()
+        }
+
         assertNotNull(rawPropositions)
         assertEquals(2, rawPropositions.size)
+        assertNotNull(offers)
+        assertEquals(3, offers.size)
+        assertEquals("246314", offers.first()["id"])
+        assertEquals("246316", offers.last()["id"])
     }
 
     @Test
@@ -114,16 +133,20 @@ class OfferUtilsTest {
         val capturedXdm = xdmSlot.captured
         verify { XDMUtils.trackWithData(any()) }
 
-        val offers = (
-            (
-                (capturedXdm["_experience"] as? Map<String, Any>)
-                    ?.get("decisioning") as? Map<String, Any>
-                )?.get("propositions") as? List<Map<String, Any>>
-            )?.flatMap { proposition ->
+        val rawPropositions = (
+            (capturedXdm["_experience"] as? Map<String, Any>)
+                ?.get("decisioning") as? Map<String, Any>
+            )?.get("propositions") as? List<Map<String, Any>>
+
+        val offers = rawPropositions?.flatMap { proposition ->
             (proposition["items"] as? List<Map<String, Any>>).orEmpty()
         }
 
+        assertNotNull(rawPropositions)
+        assertEquals(2, rawPropositions.size)
         assertEquals(offers?.size, 2)
+        assertEquals(offers?.first()?.get("id"), "246314")
+        assertEquals(offers?.last()?.get("id"), "246316")
     }
 
     @Test
@@ -143,6 +166,16 @@ class OfferUtilsTest {
 
         assertNotNull(rawPropositions)
         assertEquals(1, rawPropositions.size)
+
+        val proposition = rawPropositions.first()
+        assertEquals("prop-789", proposition["id"])
+
+        val offers = (proposition["items"] as? List<Map<String, Any>>).orEmpty()
+        assertNotNull(offers)
+        assertEquals(1, offers.size)
+
+        val offer = offers.first()
+        assertEquals("offer1", offer["id"])
     }
 
     @Test
@@ -166,6 +199,16 @@ class OfferUtilsTest {
 
         assertNotNull(rawPropositions)
         assertEquals(1, rawPropositions.size)
+
+        val proposition = rawPropositions.first()
+        assertEquals("AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ8", proposition["id"])
+
+        val offers = (proposition["items"] as? List<Map<String, Any>>).orEmpty()
+        assertNotNull(offers)
+        assertEquals(1, offers.size)
+
+        val offer = offers.first()
+        assertEquals("246314", offer["id"])
     }
 
     @Test
@@ -190,6 +233,25 @@ class OfferUtilsTest {
 
         assertNotNull(rawPropositions)
         assertEquals(2, rawPropositions.size)
+
+        val propositionIds = rawPropositions.map { it["id"] as? String }
+        assertEquals(
+            setOf(
+                "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ8",
+                "prop-789"
+            ),
+            propositionIds.toSet()
+        )
+
+        val offers = rawPropositions.flatMap { proposition ->
+            (proposition["items"] as? List<Map<String, Any>>).orEmpty()
+        }
+
+        assertNotNull(offers)
+        assertEquals(2, offers.size)
+
+        val offerIds = offers.map { it["id"] as? String }
+        assertEquals(setOf("246314", "offer1"), offerIds.toSet())
     }
 
     @Test

@@ -15,7 +15,7 @@ import com.adobe.marketing.mobile.Event
 import com.adobe.marketing.mobile.MobileCore
 import com.adobe.marketing.mobile.services.Log
 
-object XDMUtils {
+internal object XDMUtils {
 
     private const val SELF_TAG: String = "XDMUtils"
 

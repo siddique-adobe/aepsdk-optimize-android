@@ -28,7 +28,9 @@ object OfferUtils {
         val uniquePropositions = map { it.proposition }
             .distinctBy { it.id }
             .mapNotNull { proposition ->
-                val displayedOffers = proposition.offers.filter { it.id in offerIds }
+                val displayedOffers = proposition.offers.filter {
+                    it.id in offerIds
+                }.distinctBy { it.id }
                 if (displayedOffers.isNotEmpty()) {
                     OptimizeProposition(
                         proposition.id,
