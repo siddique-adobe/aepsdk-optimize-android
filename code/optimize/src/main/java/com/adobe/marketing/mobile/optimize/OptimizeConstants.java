@@ -210,7 +210,7 @@ class OptimizeConstants {
         }
 
         static final class InvalidRequest {
-            static final Integer STATUS = 400;
+            static final Integer STATUS = HTTPResponseCodes.invalidRequest;
             static final String TITLE = "Invalid Request";
             static final String DETAIL =
                     "Decision scopes, in event data, is either not present or empty.";
