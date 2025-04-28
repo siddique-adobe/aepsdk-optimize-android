@@ -54,12 +54,12 @@ android {
 
 dependencies {
     implementation(project(":optimize"))
-    implementation("com.adobe.marketing.mobile:core:3.2.0")
-    implementation("com.adobe.marketing.mobile:edge:3.0.0")
-    implementation("com.adobe.marketing.mobile:edgeidentity:3.0.0")
-    implementation("com.adobe.marketing.mobile:assurance:3.0.0")
-    implementation ("com.adobe.marketing.mobile:lifecycle:3.0.0")
-
+    implementation(platform("com.adobe.marketing.mobile:sdk-bom:3.8.0"))
+    implementation("com.adobe.marketing.mobile:edge")
+    implementation("com.adobe.marketing.mobile:core")
+    implementation("com.adobe.marketing.mobile:edgeidentity")
+    implementation("com.adobe.marketing.mobile:assurance")
+    implementation("com.adobe.marketing.mobile:lifecycle")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.core:core-ktx:1.12.0")
