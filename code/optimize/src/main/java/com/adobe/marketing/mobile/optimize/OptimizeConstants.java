@@ -13,7 +13,7 @@ package com.adobe.marketing.mobile.optimize;
 
 class OptimizeConstants {
     static final String LOG_TAG = "Optimize";
-    static final String EXTENSION_VERSION = "3.3.1";
+    static final String EXTENSION_VERSION = "3.4.0";
     static final String EXTENSION_NAME = "com.adobe.optimize";
     static final String FRIENDLY_NAME = "Optimize";
     static final double GET_RESPONSE_CALLBACK_TIMEOUT = 10;
@@ -207,6 +207,15 @@ class OptimizeConstants {
             static final String DETAIL = "An unexpected error occurred.";
 
             private Unexpected() {}
+        }
+
+        static final class InvalidRequest {
+            static final Integer STATUS = HTTPResponseCodes.invalidRequest;
+            static final String TITLE = "Invalid Request";
+            static final String DETAIL =
+                    "Decision scopes, in event data, is either not present or empty.";
+
+            private InvalidRequest() {}
         }
 
         private ErrorData() {}
