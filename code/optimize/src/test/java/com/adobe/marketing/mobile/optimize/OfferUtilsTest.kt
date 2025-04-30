@@ -12,6 +12,7 @@
 package com.adobe.marketing.mobile.optimize
 
 import com.adobe.marketing.mobile.optimize.OfferUtils.displayed
+import com.adobe.marketing.mobile.optimize.OfferUtils.generateDisplayInteractionXdm
 import com.adobe.marketing.mobile.optimize.TestUtils.loadJsonFromFile
 import io.mockk.Runs
 import io.mockk.every
@@ -25,6 +26,7 @@ import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class OfferUtilsTest {
     private lateinit var offersWithSameProposition: List<Offer>
@@ -33,6 +35,7 @@ class OfferUtilsTest {
     @Before
     fun setUp() {
         mockkStatic(XDMUtils::trackWithData)
+        mockkStatic(XDMUtils::generateInteractionXdm)
 
         val multipleItemsList: List<Map<String, Any>> =
             loadJsonFromFile("json/MULTIPLE_OFFERS_WITH_COMMON_PROPOSITIONS.json") ?: emptyList()
@@ -254,13 +257,182 @@ class OfferUtilsTest {
     }
 
     @Test
-    fun `test displayed() does nothing if uniquePropositions is empty`() {
-        val unrelatedOffers = listOf<Offer>()
+    fun `test generateDisplayInteractionXdm() returns null when list is empty`() {
+        assertNull(emptyList<Offer>().generateDisplayInteractionXdm())
+    }
 
-        every { XDMUtils.trackWithData(any()) } just Runs
+    @Test
+    fun `test generateDisplayInteractionXdm() handles single offer correctly`() {
+        val singleOffer = listOf(offersWithSameProposition.first())
+        val xdm = singleOffer.generateDisplayInteractionXdm()
 
-        unrelatedOffers.displayed()
+        assertNotNull(xdm)
+        assertEquals(OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY, xdm["eventType"])
 
-        verify(exactly = 0) { XDMUtils.trackWithData(any()) }
+        val rawPropositions = (
+            (xdm["_experience"] as? Map<String, Any>)
+                ?.get("decisioning") as? Map<String, Any>
+            )?.get("propositions") as? List<Map<String, Any>>
+
+        val offers = rawPropositions?.flatMap { proposition ->
+            (proposition["items"] as? List<Map<String, Any>>).orEmpty()
+        }
+
+        assertNotNull(rawPropositions)
+        assertEquals(1, rawPropositions.size)
+        assertEquals(
+            "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ8",
+            rawPropositions.first()["id"] as? String
+        )
+        assertNotNull(offers)
+        assertEquals(1, offers.size)
+        assertEquals("246314", offers.first()["id"] as? String)
+    }
+
+    @Test
+    fun `test generateDisplayInteractionXdm() handles multiple offers with shared propositions`() {
+        val xdm = offersWithSameProposition.generateDisplayInteractionXdm()
+
+        assertNotNull(xdm)
+        assertEquals(OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY, xdm["eventType"])
+
+        val rawPropositions = (
+            (xdm["_experience"] as? Map<String, Any>)
+                ?.get("decisioning") as? Map<String, Any>
+            )?.get("propositions") as? List<Map<String, Any>>
+
+        val offers = rawPropositions?.flatMap { proposition ->
+            (proposition["items"] as? List<Map<String, Any>>).orEmpty()
+        }
+
+        assertNotNull(rawPropositions)
+        assertEquals(2, rawPropositions.size)
+        assertNotNull(offers)
+        assertEquals(3, offers.size)
+        assertEquals("246314", offers.first()["id"])
+        assertEquals("246316", offers.last()["id"])
+    }
+
+    @Test
+    fun `test generateDisplayInteractionXdm() removes propositions with no matching offers`() {
+        val unrelatedOffers = listOf(
+            offersWithSameProposition[0],
+            offersWithSameProposition[2]
+        )
+
+        val xdm = unrelatedOffers.generateDisplayInteractionXdm()
+
+        assertNotNull(xdm)
+        assertEquals(OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY, xdm["eventType"])
+
+        val rawPropositions = (
+            (xdm["_experience"] as? Map<String, Any>)
+                ?.get("decisioning") as? Map<String, Any>
+            )?.get("propositions") as? List<Map<String, Any>>
+
+        val offers = rawPropositions?.flatMap { proposition ->
+            (proposition["items"] as? List<Map<String, Any>>).orEmpty()
+        }
+
+        assertNotNull(rawPropositions)
+        assertEquals(2, rawPropositions.size)
+        assertEquals(offers?.size, 2)
+        assertEquals(offers?.first()?.get("id"), "246314")
+        assertEquals(offers?.last()?.get("id"), "246316")
+    }
+
+    @Test
+    fun `test generateDisplayInteractionXdm() handles duplicate offers correctly`() {
+        val xdm = duplicateOffersWithSameProposition.generateDisplayInteractionXdm()
+
+        assertNotNull(xdm)
+        assertEquals(OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY, xdm["eventType"])
+
+        val rawPropositions = (
+            (xdm["_experience"] as? Map<String, Any>)
+                ?.get("decisioning") as? Map<String, Any>
+            )?.get("propositions") as? List<Map<String, Any>>
+
+        assertNotNull(rawPropositions)
+        assertEquals(1, rawPropositions.size)
+
+        val proposition = rawPropositions.first()
+        assertEquals("prop-789", proposition["id"])
+
+        val offers = (proposition["items"] as? List<Map<String, Any>>).orEmpty()
+        assertNotNull(offers)
+        assertEquals(1, offers.size)
+
+        val offer = offers.first()
+        assertEquals("offer1", offer["id"])
+    }
+
+    @Test
+    fun `test generateDisplayInteractionXdm() handles all offers belonging to the same proposition`() {
+        val allSamePropositionOffers = offersWithSameProposition.filter {
+            it.proposition.id == offersWithSameProposition.first().proposition.id
+        }
+
+        val xdm = allSamePropositionOffers.generateDisplayInteractionXdm()
+
+        assertNotNull(xdm)
+        assertEquals(OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY, xdm["eventType"])
+
+        val rawPropositions = (
+            (xdm["_experience"] as? Map<String, Any>)
+                ?.get("decisioning") as? Map<String, Any>
+            )?.get("propositions") as? List<Map<String, Any>>
+
+        assertNotNull(rawPropositions)
+        assertEquals(1, rawPropositions.size)
+
+        val proposition = rawPropositions.first()
+        assertEquals("AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ8", proposition["id"])
+
+        val offers = (proposition["items"] as? List<Map<String, Any>>).orEmpty()
+        assertNotNull(offers)
+        assertEquals(1, offers.size)
+
+        val offer = offers.first()
+        assertEquals("246314", offer["id"])
+    }
+
+    @Test
+    fun `test generateDisplayInteractionXdm() handles offers with mixed proposition references`() {
+        val mixedOffers = listOf(
+            offersWithSameProposition.first(),
+            duplicateOffersWithSameProposition.first()
+        )
+
+        val xdm = mixedOffers.generateDisplayInteractionXdm()
+
+        assertNotNull(xdm)
+        assertEquals(OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY, xdm["eventType"])
+
+        val rawPropositions = (
+            (xdm["_experience"] as? Map<String, Any>)
+                ?.get("decisioning") as? Map<String, Any>
+            )?.get("propositions") as? List<Map<String, Any>>
+
+        assertNotNull(rawPropositions)
+        assertEquals(2, rawPropositions.size)
+
+        val propositionIds = rawPropositions.map { it["id"] as? String }
+        assertEquals(
+            setOf(
+                "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ8",
+                "prop-789"
+            ),
+            propositionIds.toSet()
+        )
+
+        val offers = rawPropositions.flatMap { proposition ->
+            (proposition["items"] as? List<Map<String, Any>>).orEmpty()
+        }
+
+        assertNotNull(offers)
+        assertEquals(2, offers.size)
+        assertEquals("246314", offers.first()["id"])
+        assertEquals("offer1", offers.last()["id"])
     }
 }

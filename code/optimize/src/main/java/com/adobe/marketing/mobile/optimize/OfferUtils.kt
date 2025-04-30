@@ -42,7 +42,7 @@ object OfferUtils {
      * proposition ID and generates XDM data for the interaction.
      *
      * @return [Map] containing the XDM data for the proposition interaction, or null if the list is empty
-     *         or no valid propositions are found
+     * or no valid propositions are found
      */
     @JvmStatic
     fun List<Offer>.generateDisplayInteractionXdm(): Map<String, Any>? {
