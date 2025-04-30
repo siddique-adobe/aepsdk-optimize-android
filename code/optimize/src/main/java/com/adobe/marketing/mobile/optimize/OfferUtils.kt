@@ -21,11 +21,49 @@ object OfferUtils {
      *
      * @see XDMUtils.trackWithData
      */
+    @JvmStatic
     fun List<Offer>.displayed() {
         if (isEmpty()) return
-        val offerIds = mapTo(mutableSetOf()) { it.id }
+        val uniquePropositions = mapToUniquePropositions()
+        if (uniquePropositions.isEmpty()) return
+        XDMUtils.trackWithData(
+            XDMUtils.generateInteractionXdm(
+                OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
+                uniquePropositions
+            )
+        )
+    }
 
-        val uniquePropositions = map { it.proposition }
+    /**
+     * Generates a map containing XDM formatted data for `Experience Event - OptimizeProposition
+     * Interactions` field group from the given list of [Offer]s.
+     *
+     * This function extracts unique [OptimizeProposition]s from the list of offers based on their
+     * proposition ID and generates XDM data for the interaction.
+     *
+     * @return [Map] containing the XDM data for the proposition interaction, or null if the list is empty
+     *         or no valid propositions are found
+     */
+    @JvmStatic
+    fun List<Offer>.generateDisplayInteractionXdm(): Map<String, Any>? {
+        if (isEmpty()) return null
+        val uniquePropositions = mapToUniquePropositions()
+        if (uniquePropositions.isEmpty()) return null
+        return XDMUtils.generateInteractionXdm(
+            OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
+            uniquePropositions
+        )
+    }
+
+    /**
+     * Extracts unique [OptimizeProposition]s from the list of offers based on their proposition ID.
+     * For each proposition, it filters the offers to only include those that are present in the original list.
+     *
+     * @return [List] of unique [OptimizeProposition]s with filtered offers, or empty list if no valid propositions are found
+     */
+    private fun List<Offer>.mapToUniquePropositions(): List<OptimizeProposition> {
+        val offerIds = mapTo(mutableSetOf()) { it.id }
+        return map { it.proposition }
             .distinctBy { it.id }
             .mapNotNull { proposition ->
                 val displayedOffers = proposition.offers.filter {
@@ -40,11 +78,5 @@ object OfferUtils {
                     )
                 } else null
             }
-        if (uniquePropositions.isEmpty()) return
-        XDMUtils.trackWithData(
-            XDMUtils.generateInteractionXdm(
-                OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY, uniquePropositions
-            )
-        )
     }
 }

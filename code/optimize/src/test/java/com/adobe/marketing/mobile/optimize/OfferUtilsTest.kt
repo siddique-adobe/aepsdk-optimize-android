@@ -33,7 +33,6 @@ class OfferUtilsTest {
     @Before
     fun setUp() {
         mockkStatic(XDMUtils::trackWithData)
-        mockkStatic(XDMUtils::generateInteractionXdm)
 
         val multipleItemsList: List<Map<String, Any>> =
             loadJsonFromFile("json/MULTIPLE_OFFERS_WITH_COMMON_PROPOSITIONS.json") ?: emptyList()
