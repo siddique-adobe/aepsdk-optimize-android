@@ -1465,6 +1465,8 @@ public class OptimizeFunctionalTests {
                         "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
                         Collections.singletonList(offer),
                         "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ==",
+                        Collections.emptyMap(),
+                        Collections.emptyMap(),
                         Collections.emptyMap());
 
         // Action
@@ -1543,10 +1545,21 @@ public class OptimizeFunctionalTests {
                         + "                }\n"
                         + "            ]\n"
                         + "        }\n";
+        final String testActivity =
+                "        {\n" + "            \"id\": \"125589\"\n" + "        }";
+        final String testPlacement =
+                "        {\n" + "            \"id\": \"567890\"\n" + "        }";
         ObjectMapper objectMapper = new ObjectMapper();
+
         Map<String, Object> testDecisionScopesMap =
                 objectMapper.readValue(
                         testScopeDetails, new TypeReference<Map<String, Object>>() {});
+
+        Map<String, Object> testActivityMap =
+                objectMapper.readValue(testActivity, new TypeReference<Map<String, Object>>() {});
+
+        Map<String, Object> testPlacementMap =
+                objectMapper.readValue(testPlacement, new TypeReference<Map<String, Object>>() {});
 
         Offer offer = new Offer.Builder("246315", OfferType.TEXT, "Text Offer!!").build();
         // Set the proposition soft reference to Offer
@@ -1555,7 +1568,9 @@ public class OptimizeFunctionalTests {
                         "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ9",
                         Collections.singletonList(offer),
                         "myMbox",
-                        testDecisionScopesMap);
+                        testDecisionScopesMap,
+                        testActivityMap,
+                        testPlacementMap);
 
         // Action
         TestHelper.resetTestExpectations();
@@ -1633,10 +1648,21 @@ public class OptimizeFunctionalTests {
                         + "                }\n"
                         + "            ]\n"
                         + "        }\n";
+        final String testActivity =
+                "        {\n" + "            \"id\": \"125589\"\n" + "        }";
+        final String testPlacement =
+                "        {\n" + "            \"id\": \"567890\"\n" + "        }";
         ObjectMapper objectMapper = new ObjectMapper();
+
         Map<String, Object> testDecisionScopesMap =
                 objectMapper.readValue(
                         testDecisionScopes, new TypeReference<Map<String, Object>>() {});
+
+        Map<String, Object> testActivityMap =
+                objectMapper.readValue(testActivity, new TypeReference<Map<String, Object>>() {});
+
+        Map<String, Object> testPlacementMap =
+                objectMapper.readValue(testPlacement, new TypeReference<Map<String, Object>>() {});
 
         Offer offer = new Offer.Builder("246315", OfferType.TEXT, "Text Offer!!").build();
         OptimizeProposition optimizeProposition =
@@ -1644,7 +1670,9 @@ public class OptimizeFunctionalTests {
                         "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ9",
                         Collections.singletonList(offer),
                         "myMbox",
-                        testDecisionScopesMap);
+                        testDecisionScopesMap,
+                        testActivityMap,
+                        testPlacementMap);
 
         // Action
         TestHelper.resetTestExpectations();
@@ -2679,6 +2707,8 @@ public class OptimizeFunctionalTests {
                         "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ8",
                         Collections.singletonList(offer1),
                         "myMbox1",
+                        Collections.emptyMap(),
+                        Collections.emptyMap(),
                         Collections.emptyMap());
 
         OptimizeProposition optimizeProposition2 =
@@ -2686,6 +2716,8 @@ public class OptimizeFunctionalTests {
                         "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ9",
                         Collections.singletonList(offer2),
                         "myMbox2",
+                        Collections.emptyMap(),
+                        Collections.emptyMap(),
                         Collections.emptyMap());
 
         List<OptimizeProposition> optimizePropositionList = new ArrayList<>();

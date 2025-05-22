@@ -316,7 +316,9 @@ public class Offer {
                         propositionReference.get().getId(),
                         Collections.singletonList(this),
                         propositionReference.get().getScope(),
-                        propositionReference.get().getScopeDetails());
+                        propositionReference.get().getScopeDetails(),
+                        propositionReference.get().getActivity(),
+                        propositionReference.get().getPlacement());
         return XDMUtils.generateInteractionXdm(
                 OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
                 Collections.singletonList(proposition));
@@ -344,7 +346,9 @@ public class Offer {
                         propositionReference.get().getId(),
                         Collections.singletonList(this),
                         propositionReference.get().getScope(),
-                        propositionReference.get().getScopeDetails());
+                        propositionReference.get().getScopeDetails(),
+                        propositionReference.get().getActivity(),
+                        propositionReference.get().getPlacement());
         return XDMUtils.generateInteractionXdm(
                 OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_INTERACT,
                 Collections.singletonList(proposition));

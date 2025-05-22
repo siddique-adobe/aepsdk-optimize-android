@@ -67,7 +67,15 @@ internal object XDMUtils {
                     mutableMapOf<String, Any>(
                         OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_ID to prop.id,
                         OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_SCOPE to prop.scope,
-                        OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_SCOPEDETAILS to prop.scopeDetails,
+                        OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_SCOPEDETAILS to prop.scopeDetails.toMutableMap().apply {
+                            if (!this.containsKey(OptimizeConstants.JsonKeys.PAYLOAD_ACTIVITY) && prop.activity.isNotEmpty()) {
+                                this[OptimizeConstants.JsonKeys.PAYLOAD_ACTIVITY] = prop.activity
+                            }
+
+                            if (!this.containsKey(OptimizeConstants.JsonKeys.PAYLOAD_PLACEMENT) && prop.placement.isNotEmpty()) {
+                                this[OptimizeConstants.JsonKeys.PAYLOAD_PLACEMENT] = prop.placement
+                            }
+                        },
                         OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_ITEMS to prop.offers.map { offer ->
                             mapOf(OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_ITEMS_ID to offer.id)
                         }

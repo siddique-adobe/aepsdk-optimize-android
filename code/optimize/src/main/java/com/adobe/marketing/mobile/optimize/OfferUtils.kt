@@ -74,7 +74,9 @@ object OfferUtils {
                         proposition.id,
                         displayedOffers,
                         proposition.scope,
-                        proposition.scopeDetails
+                        proposition.scopeDetails,
+                        proposition.activity,
+                        proposition.placement
                     )
                 } else null
             }
