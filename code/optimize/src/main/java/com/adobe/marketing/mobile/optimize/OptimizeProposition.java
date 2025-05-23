@@ -28,8 +28,35 @@ public class OptimizeProposition {
     private final List<Offer> offers;
     private final String scope;
     private final Map<String, Object> scopeDetails;
-    private final Map<String, Object> activity;
-    private final Map<String, Object> placement;
+    private Map<String, Object> activity;
+    private Map<String, Object> placement;
+
+    /**
+     * Constructor creates a {@code OptimizeProposition} using the provided proposition {@code id},
+     * {@code offers}, {@code scope} and {@code scopeDetails}.
+     *
+     * @param id {@link String} containing proposition identifier.
+     * @param offers {@code List<Offer>} containing proposition items.
+     * @param scope {@code String} containing encoded scope.
+     * @param scopeDetails {@code Map<String, Object>} containing scope details.
+     */
+    OptimizeProposition(
+            final String id,
+            final List<Offer> offers,
+            final String scope,
+            final Map<String, Object> scopeDetails) {
+        this.id = id != null ? id : "";
+        this.scope = scope != null ? scope : "";
+        this.scopeDetails = scopeDetails != null ? scopeDetails : new HashMap<>();
+
+        this.offers = offers != null ? offers : new ArrayList<>();
+        // Setting a soft reference to OptimizeProposition in each Offer
+        for (final Offer o : this.offers) {
+            if (o.propositionReference == null) {
+                o.propositionReference = new SoftReference<>(this);
+            }
+        }
+    }
 
     /**
      * Constructor creates a {@code OptimizeProposition} using the provided proposition {@code id},
