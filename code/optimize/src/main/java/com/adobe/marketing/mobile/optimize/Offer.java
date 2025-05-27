@@ -321,13 +321,12 @@ public class Offer {
         OptimizeProposition original = propositionReference.get();
         OptimizeProposition proposition;
 
-        if (original.getScopeDetails().isEmpty()) {
+        if (original.getScopeDetails() == null || original.getScopeDetails().isEmpty()) {
             proposition =
                     new OptimizeProposition(
                             original.getId(),
                             Collections.singletonList(this),
                             original.getScope(),
-                            original.getScopeDetails(),
                             original.getActivity(),
                             original.getPlacement());
         } else {
@@ -371,13 +370,12 @@ public class Offer {
         OptimizeProposition original = propositionReference.get();
         OptimizeProposition proposition;
 
-        if (original.getScopeDetails().isEmpty()) {
+        if (original.getScopeDetails() == null || original.getScopeDetails().isEmpty()) {
             proposition =
                     new OptimizeProposition(
                             original.getId(),
                             Collections.singletonList(this),
                             original.getScope(),
-                            original.getScopeDetails(),
                             original.getActivity(),
                             original.getPlacement());
         } else {

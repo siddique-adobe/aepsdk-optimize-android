@@ -61,18 +61,21 @@ internal object XDMUtils {
                             mapOf(OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_ITEMS_ID to offer.id)
                         }
                     ).apply {
-                        val scopeDetails = prop.scopeDetails?.toMutableMap() ?: mutableMapOf()
-
-                        if (scopeDetails.isEmpty()) {
+                        if (prop.scopeDetails.isNullOrEmpty()) {
+                            val scopeDetails = mutableMapOf<String, Any>()
                             prop.activity?.takeIf { it.isNotEmpty() }?.let {
                                 scopeDetails[OptimizeConstants.JsonKeys.PAYLOAD_ACTIVITY] = it
                             }
                             prop.placement?.takeIf { it.isNotEmpty() }?.let {
                                 scopeDetails[OptimizeConstants.JsonKeys.PAYLOAD_PLACEMENT] = it
                             }
+                            put(OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_SCOPEDETAILS, scopeDetails)
+                        } else {
+                            put(
+                                OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_SCOPEDETAILS,
+                                prop.scopeDetails ?: emptyMap<String, Any>()
+                            )
                         }
-
-                        put(OptimizeConstants.JsonKeys.DECISIONING_PROPOSITIONS_SCOPEDETAILS, scopeDetails)
                     }
                 }
             )

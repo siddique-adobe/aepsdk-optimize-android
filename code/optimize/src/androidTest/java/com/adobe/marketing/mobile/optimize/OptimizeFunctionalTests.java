@@ -2682,7 +2682,6 @@ public class OptimizeFunctionalTests {
                         Collections.singletonList(offer1),
                         "myMbox1",
                         Collections.emptyMap(),
-                        Collections.emptyMap(),
                         Collections.emptyMap());
 
         OptimizeProposition optimizeProposition2 =
@@ -2690,7 +2689,6 @@ public class OptimizeFunctionalTests {
                         "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ9",
                         Collections.singletonList(offer2),
                         "myMbox2",
-                        Collections.emptyMap(),
                         Collections.emptyMap(),
                         Collections.emptyMap());
 

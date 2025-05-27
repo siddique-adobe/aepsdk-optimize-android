@@ -11,6 +11,7 @@
 
 package com.adobe.marketing.mobile.optimize;
 
+import androidx.annotation.Nullable;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
 import java.lang.ref.SoftReference;
@@ -27,13 +28,14 @@ public class OptimizeProposition {
     private final String id;
     private final List<Offer> offers;
     private final String scope;
-    private final Map<String, Object> scopeDetails;
-    private Map<String, Object> activity;
-    private Map<String, Object> placement;
+    @Nullable private Map<String, Object> scopeDetails;
+    @Nullable private Map<String, Object> activity;
+    @Nullable private Map<String, Object> placement;
 
     /**
      * Constructor creates a {@code OptimizeProposition} using the provided proposition {@code id},
-     * {@code offers}, {@code scope} and {@code scopeDetails}.
+     * {@code offers}, {@code scope} and {@code scopeDetails} for personalization response of
+     * target.
      *
      * @param id {@link String} containing proposition identifier.
      * @param offers {@code List<Offer>} containing proposition items.
@@ -60,12 +62,12 @@ public class OptimizeProposition {
 
     /**
      * Constructor creates a {@code OptimizeProposition} using the provided proposition {@code id},
-     * {@code offers}, {@code scope} and {@code scopeDetails}.
+     * {@code offers}, {@code scope}, {@code activity} and {@code placement} for personalization
+     * response of ODE.
      *
      * @param id {@link String} containing proposition identifier.
      * @param offers {@code List<Offer>} containing proposition items.
      * @param scope {@code String} containing encoded scope.
-     * @param scopeDetails {@code Map<String, Object>} containing scope details.
      * @param activity {@code Map<String, Object>} containing activity details.
      * @param placement {@code Map<String, Object>} containing placement details.
      */
@@ -73,12 +75,10 @@ public class OptimizeProposition {
             final String id,
             final List<Offer> offers,
             final String scope,
-            final Map<String, Object> scopeDetails,
             final Map<String, Object> activity,
             final Map<String, Object> placement) {
         this.id = id != null ? id : "";
         this.scope = scope != null ? scope : "";
-        this.scopeDetails = scopeDetails != null ? scopeDetails : new HashMap<>();
         this.activity = activity != null ? activity : new HashMap<>();
         this.placement = placement != null ? placement : new HashMap<>();
 
@@ -123,7 +123,7 @@ public class OptimizeProposition {
      *
      * @return {@code Map<String, Object>} containing the {@link OptimizeProposition} scope details.
      */
-    public Map<String, Object> getScopeDetails() {
+    @Nullable public Map<String, Object> getScopeDetails() {
         return scopeDetails;
     }
 
@@ -132,7 +132,7 @@ public class OptimizeProposition {
      *
      * @return {@code Map<String, Object>} containing the activity details.
      */
-    public Map<String, Object> getActivity() {
+    @Nullable public Map<String, Object> getActivity() {
         return activity;
     }
 
@@ -141,7 +141,7 @@ public class OptimizeProposition {
      *
      * @return {@code Map<String, Object>} containing the placement details.
      */
-    public Map<String, Object> getPlacement() {
+    @Nullable public Map<String, Object> getPlacement() {
         return placement;
     }
 
@@ -173,7 +173,9 @@ public class OptimizeProposition {
      * contain required info for creating a {@link OptimizeProposition} object.
      *
      * @param data {@code Map<String, Object>} containing proposition data.
-     * @return {@code OptimizeProposition} object or null.
+     * @return {@code OptimizeProposition} object or null, which may or may not contain
+     *     scopeDetails, activity and placement based of the data provider TGT or AJO (i.e, target
+     *     or ODE).
      */
     public static OptimizeProposition fromEventData(final Map<String, Object> data) {
         if (OptimizeUtils.isNullOrEmpty(data)) {
@@ -208,17 +210,20 @@ public class OptimizeProposition {
 
             // Get existing scopeDetails or create new one
             Map<String, Object> scopeDetails =
-                    DataReader.getTypedMap(
-                            Object.class, data, OptimizeConstants.JsonKeys.PAYLOAD_SCOPEDETAILS);
+                    DataReader.optTypedMap(
+                            Object.class,
+                            data,
+                            OptimizeConstants.JsonKeys.PAYLOAD_SCOPEDETAILS,
+                            null);
 
             // Parse activity and placement objects
             Map<String, Object> activity =
-                    DataReader.getTypedMap(
-                            Object.class, data, OptimizeConstants.JsonKeys.PAYLOAD_ACTIVITY);
+                    DataReader.optTypedMap(
+                            Object.class, data, OptimizeConstants.JsonKeys.PAYLOAD_ACTIVITY, null);
 
             Map<String, Object> placement =
-                    DataReader.getTypedMap(
-                            Object.class, data, OptimizeConstants.JsonKeys.PAYLOAD_PLACEMENT);
+                    DataReader.optTypedMap(
+                            Object.class, data, OptimizeConstants.JsonKeys.PAYLOAD_PLACEMENT, null);
 
             final List<Map<String, Object>> items =
                     DataReader.getTypedListOfMap(
@@ -233,7 +238,9 @@ public class OptimizeProposition {
                 }
             }
 
-            return new OptimizeProposition(id, offers, scope, scopeDetails, activity, placement);
+            return scopeDetails != null
+                    ? new OptimizeProposition(id, offers, scope, scopeDetails)
+                    : new OptimizeProposition(id, offers, scope, activity, placement);
 
         } catch (Exception e) {
             Log.warning(

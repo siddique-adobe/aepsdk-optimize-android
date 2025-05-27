@@ -75,11 +75,10 @@ object OfferUtils {
                     it.id in offerIds
                 }.distinctBy { it.id }
                 if (displayedOffers.isNotEmpty()) {
-                    if (proposition.scopeDetails.isEmpty()) OptimizeProposition(
+                    if (proposition.scopeDetails.isNullOrEmpty()) OptimizeProposition(
                         proposition.id,
                         displayedOffers,
                         proposition.scope,
-                        proposition.scopeDetails,
                         proposition.activity,
                         proposition.placement
                     ) else OptimizeProposition(
