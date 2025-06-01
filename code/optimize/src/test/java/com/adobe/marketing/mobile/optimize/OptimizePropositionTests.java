@@ -38,7 +38,7 @@ public class OptimizePropositionTests {
         Assert.assertEquals(
                 "eydhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ==",
                 optimizeProposition.getScope());
-        Assert.assertNull(optimizeProposition.getScopeDetails());
+        Assert.assertTrue(optimizeProposition.getScopeDetails().isEmpty());
         Assert.assertEquals(1, optimizeProposition.getOffers().size());
 
         Offer offer = optimizeProposition.getOffers().get(0);
@@ -180,7 +180,7 @@ public class OptimizePropositionTests {
 
         Assert.assertEquals("test-id", optimizeProposition.getId());
         Assert.assertEquals("test-scope", optimizeProposition.getScope());
-        Assert.assertNull(optimizeProposition.getScopeDetails());
+        Assert.assertTrue(optimizeProposition.getScopeDetails().isEmpty());
         Assert.assertEquals(1, optimizeProposition.getOffers().size());
 
         Map<String, Object> activity = optimizeProposition.getActivity();
@@ -287,7 +287,12 @@ public class OptimizePropositionTests {
 
         OptimizeProposition proposition =
                 new OptimizeProposition(
-                        "test-id", Collections.emptyList(), "test-scope", activity, placement);
+                        "test-id",
+                        Collections.emptyList(),
+                        "test-scope",
+                        null,
+                        activity,
+                        placement);
 
         Map<String, Object> xdm = proposition.generateReferenceXdm();
         Assert.assertNotNull(xdm);
@@ -312,7 +317,7 @@ public class OptimizePropositionTests {
 
         OptimizeProposition proposition =
                 new OptimizeProposition(
-                        "test-id", Collections.emptyList(), "test-scope", scopeDetails);
+                        "test-id", Collections.emptyList(), "test-scope", scopeDetails, null, null);
 
         Map<String, Object> xdm = proposition.generateReferenceXdm();
         Assert.assertNotNull(xdm);
@@ -332,6 +337,7 @@ public class OptimizePropositionTests {
                         "test-id",
                         Collections.emptyList(),
                         "test-scope",
+                        null,
                         Collections.emptyMap(),
                         Collections.emptyMap());
 
@@ -340,6 +346,7 @@ public class OptimizePropositionTests {
                         "test-id",
                         Collections.emptyList(),
                         "test-scope",
+                        null,
                         Collections.emptyMap(),
                         Collections.emptyMap());
 
@@ -348,6 +355,7 @@ public class OptimizePropositionTests {
                         "different-id",
                         Collections.emptyList(),
                         "test-scope",
+                        null,
                         Collections.emptyMap(),
                         Collections.emptyMap());
 

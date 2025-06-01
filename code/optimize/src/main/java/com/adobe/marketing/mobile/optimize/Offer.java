@@ -321,22 +321,14 @@ public class Offer {
         OptimizeProposition original = propositionReference.get();
         OptimizeProposition proposition;
 
-        if (original.getScopeDetails() == null || original.getScopeDetails().isEmpty()) {
-            proposition =
-                    new OptimizeProposition(
-                            original.getId(),
-                            Collections.singletonList(this),
-                            original.getScope(),
-                            original.getActivity(),
-                            original.getPlacement());
-        } else {
-            proposition =
-                    new OptimizeProposition(
-                            original.getId(),
-                            Collections.singletonList(this),
-                            original.getScope(),
-                            original.getScopeDetails());
-        }
+        proposition =
+                new OptimizeProposition(
+                        original.getId(),
+                        Collections.singletonList(this),
+                        original.getScope(),
+                        original.getScopeDetails(),
+                        original.getActivity(),
+                        original.getPlacement());
 
         return XDMUtils.generateInteractionXdm(
                 OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_DISPLAY,
@@ -370,22 +362,14 @@ public class Offer {
         OptimizeProposition original = propositionReference.get();
         OptimizeProposition proposition;
 
-        if (original.getScopeDetails() == null || original.getScopeDetails().isEmpty()) {
-            proposition =
-                    new OptimizeProposition(
-                            original.getId(),
-                            Collections.singletonList(this),
-                            original.getScope(),
-                            original.getActivity(),
-                            original.getPlacement());
-        } else {
-            proposition =
-                    new OptimizeProposition(
-                            original.getId(),
-                            Collections.singletonList(this),
-                            original.getScope(),
-                            original.getScopeDetails());
-        }
+        proposition =
+                new OptimizeProposition(
+                        original.getId(),
+                        Collections.singletonList(this),
+                        original.getScope(),
+                        original.getScopeDetails(),
+                        original.getActivity(),
+                        original.getPlacement());
 
         return XDMUtils.generateInteractionXdm(
                 OptimizeConstants.JsonValues.EE_EVENT_TYPE_PROPOSITION_INTERACT,

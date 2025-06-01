@@ -444,6 +444,7 @@ class OfferUtilsTest {
             "test-id",
             listOf(offer) as List<Offer?>?,
             "test-scope",
+            null,
             emptyMap(),
             emptyMap()
         )
@@ -478,7 +479,9 @@ class OfferUtilsTest {
             "test-id",
             listOf(offer),
             "test-scope",
-            scopeDetails
+            scopeDetails,
+            null,
+            null
         )
         offer.propositionReference = SoftReference(proposition)
 
@@ -509,6 +512,7 @@ class OfferUtilsTest {
             "test-id",
             listOf(offer),
             "test-scope",
+            null,
             activity,
             placement
         )

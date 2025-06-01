@@ -1465,7 +1465,9 @@ public class OptimizeFunctionalTests {
                         "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
                         Collections.singletonList(offer),
                         "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ==",
-                        Collections.emptyMap());
+                        Collections.emptyMap(),
+                        null,
+                        null);
 
         // Action
         TestHelper.resetTestExpectations();
@@ -1555,7 +1557,9 @@ public class OptimizeFunctionalTests {
                         "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ9",
                         Collections.singletonList(offer),
                         "myMbox",
-                        testDecisionScopesMap);
+                        testDecisionScopesMap,
+                        null,
+                        null);
 
         // Action
         TestHelper.resetTestExpectations();
@@ -1644,7 +1648,9 @@ public class OptimizeFunctionalTests {
                         "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ9",
                         Collections.singletonList(offer),
                         "myMbox",
-                        testDecisionScopesMap);
+                        testDecisionScopesMap,
+                        null,
+                        null);
 
         // Action
         TestHelper.resetTestExpectations();
@@ -2681,6 +2687,7 @@ public class OptimizeFunctionalTests {
                         "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ8",
                         Collections.singletonList(offer1),
                         "myMbox1",
+                        null,
                         Collections.emptyMap(),
                         Collections.emptyMap());
 
@@ -2689,6 +2696,7 @@ public class OptimizeFunctionalTests {
                         "AT:eyJhY3Rpdml0eUlkIjoiMTI1NTg5IiwiZXhwZXJpZW5jZUlkIjoiMCJ9",
                         Collections.singletonList(offer2),
                         "myMbox2",
+                        null,
                         Collections.emptyMap(),
                         Collections.emptyMap());
 

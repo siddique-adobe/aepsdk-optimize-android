@@ -166,6 +166,7 @@ class XDMUtilsTest {
             "test-id",
             emptyList(),
             "test-scope",
+            null,
             emptyMap(),
             emptyMap()
         )
@@ -201,6 +202,8 @@ class XDMUtilsTest {
             emptyList(),
             "test-scope",
             scopeDetails,
+            null,
+            null
         )
         val result = XDMUtils.generateInteractionXdm(experienceEventType, listOf(proposition))
 
@@ -232,6 +235,7 @@ class XDMUtilsTest {
             "test-id",
             emptyList(),
             "test-scope",
+            null,
             activity,
             placement
         )
@@ -263,6 +267,7 @@ class XDMUtilsTest {
             emptyList(),
             "test-scope",
             null,
+            null,
             null
         )
         val result = XDMUtils.generateInteractionXdm(experienceEventType, listOf(proposition))
@@ -292,6 +297,8 @@ class XDMUtilsTest {
             "test-id",
             emptyList(),
             "test-scope",
+            null,
+            null,
             null
         )
         val result = XDMUtils.generateInteractionXdm(experienceEventType, listOf(proposition))
@@ -321,6 +328,7 @@ class XDMUtilsTest {
             "test-id",
             emptyList(),
             "test-scope",
+            null,
             emptyMap(),
             emptyMap()
         )
@@ -351,6 +359,7 @@ class XDMUtilsTest {
             "test-id",
             null,
             "test-scope",
+            null,
             emptyMap(),
             emptyMap()
         )
@@ -380,6 +389,7 @@ class XDMUtilsTest {
         val proposition = OptimizeProposition(
             "test-id",
             emptyList(),
+            null,
             null,
             emptyMap(),
             emptyMap()
@@ -411,6 +421,7 @@ class XDMUtilsTest {
             null,
             emptyList(),
             "test-scope",
+            null,
             emptyMap(),
             emptyMap()
         )

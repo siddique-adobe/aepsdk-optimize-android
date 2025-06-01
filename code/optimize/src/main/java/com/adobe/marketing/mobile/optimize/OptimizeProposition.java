@@ -28,14 +28,14 @@ public class OptimizeProposition {
     private final String id;
     private final List<Offer> offers;
     private final String scope;
-    @Nullable private Map<String, Object> scopeDetails;
-    @Nullable private Map<String, Object> activity;
-    @Nullable private Map<String, Object> placement;
+    @Nullable private final Map<String, Object> scopeDetails;
+    @Nullable private final Map<String, Object> activity;
+    @Nullable private final Map<String, Object> placement;
 
     /**
      * Constructor creates a {@code OptimizeProposition} using the provided proposition {@code id},
-     * {@code offers}, {@code scope} and {@code scopeDetails} for personalization response of
-     * target.
+     * {@code offers}, {@code scope}, {@code scopeDetails}, {@code activity} and {@code placement}
+     * for personalization response
      *
      * @param id {@link String} containing proposition identifier.
      * @param offers {@code List<Offer>} containing proposition items.
@@ -46,39 +46,12 @@ public class OptimizeProposition {
             final String id,
             final List<Offer> offers,
             final String scope,
-            final Map<String, Object> scopeDetails) {
-        this.id = id != null ? id : "";
-        this.scope = scope != null ? scope : "";
-        this.scopeDetails = scopeDetails != null ? scopeDetails : new HashMap<>();
-
-        this.offers = offers != null ? offers : new ArrayList<>();
-        // Setting a soft reference to OptimizeProposition in each Offer
-        for (final Offer o : this.offers) {
-            if (o.propositionReference == null) {
-                o.propositionReference = new SoftReference<>(this);
-            }
-        }
-    }
-
-    /**
-     * Constructor creates a {@code OptimizeProposition} using the provided proposition {@code id},
-     * {@code offers}, {@code scope}, {@code activity} and {@code placement} for personalization
-     * response of ODE.
-     *
-     * @param id {@link String} containing proposition identifier.
-     * @param offers {@code List<Offer>} containing proposition items.
-     * @param scope {@code String} containing encoded scope.
-     * @param activity {@code Map<String, Object>} containing activity details.
-     * @param placement {@code Map<String, Object>} containing placement details.
-     */
-    OptimizeProposition(
-            final String id,
-            final List<Offer> offers,
-            final String scope,
+            final Map<String, Object> scopeDetails,
             final Map<String, Object> activity,
             final Map<String, Object> placement) {
         this.id = id != null ? id : "";
         this.scope = scope != null ? scope : "";
+        this.scopeDetails = scopeDetails != null ? scopeDetails : new HashMap<>();
         this.activity = activity != null ? activity : new HashMap<>();
         this.placement = placement != null ? placement : new HashMap<>();
 
@@ -238,9 +211,7 @@ public class OptimizeProposition {
                 }
             }
 
-            return scopeDetails != null
-                    ? new OptimizeProposition(id, offers, scope, scopeDetails)
-                    : new OptimizeProposition(id, offers, scope, activity, placement);
+            return new OptimizeProposition(id, offers, scope, scopeDetails, activity, placement);
 
         } catch (Exception e) {
             Log.warning(

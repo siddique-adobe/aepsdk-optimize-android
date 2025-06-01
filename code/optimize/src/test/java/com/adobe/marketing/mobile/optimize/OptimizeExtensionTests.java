@@ -885,7 +885,7 @@ public class OptimizeExtensionTests {
         Assert.assertEquals(
                 "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ==",
                 optimizeProposition.getScope());
-        Assert.assertNull(optimizeProposition.getScopeDetails());
+        Assert.assertTrue(optimizeProposition.getScopeDetails().isEmpty());
         Assert.assertEquals(1, optimizeProposition.getOffers().size());
 
         final Offer offer = optimizeProposition.getOffers().get(0);
@@ -2359,7 +2359,7 @@ public class OptimizeExtensionTests {
         Assert.assertEquals(
                 "eyJhY3Rpdml0eUlkIjoieGNvcmU6b2ZmZXItYWN0aXZpdHk6MTExMTExMTExMTExMTExMSIsInBsYWNlbWVudElkIjoieGNvcmU6b2ZmZXItcGxhY2VtZW50OjExMTExMTExMTExMTExMTEifQ==",
                 optimizeProposition.getScope());
-        Assert.assertNull(optimizeProposition.getScopeDetails());
+        Assert.assertTrue(optimizeProposition.getScopeDetails().isEmpty());
         Assert.assertEquals(1, optimizeProposition.getOffers().size());
 
         final Offer offer = optimizeProposition.getOffers().get(0);

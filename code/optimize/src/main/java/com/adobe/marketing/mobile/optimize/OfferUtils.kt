@@ -61,9 +61,6 @@ object OfferUtils {
      * <p>For each distinct proposition, it filters the associated offers to include only those
      * present in the original list (matched by offer ID).
      *
-     * <p>If the proposition's [scopeDetails] map is empty, the resulting [OptimizeProposition]
-     * includes additional [activity] and [placement] metadata; otherwise, a simpler constructor is used.
-     *
      * @return [List] of unique [OptimizeProposition]s with filtered offers, or an empty list if no valid propositions are found.
      */
     private fun List<Offer>.mapToUniquePropositions(): List<OptimizeProposition> {
@@ -75,17 +72,13 @@ object OfferUtils {
                     it.id in offerIds
                 }.distinctBy { it.id }
                 if (displayedOffers.isNotEmpty()) {
-                    if (proposition.scopeDetails.isNullOrEmpty()) OptimizeProposition(
+                    OptimizeProposition(
                         proposition.id,
                         displayedOffers,
                         proposition.scope,
+                        proposition.scopeDetails,
                         proposition.activity,
                         proposition.placement
-                    ) else OptimizeProposition(
-                        proposition.id,
-                        displayedOffers,
-                        proposition.scope,
-                        proposition.scopeDetails
                     )
                 } else null
             }
